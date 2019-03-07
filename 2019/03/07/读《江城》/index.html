@@ -87,7 +87,7 @@
 <meta property="og:description" content="这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="https://hningoba.github.io/img/江城.jpg">
-<meta property="og:updated_time" content="2019-03-07T12:37:33.846Z">
+<meta property="og:updated_time" content="2019-03-07T12:50:12.903Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="读《江城》，作者彼得.海勒斯">
 <meta name="twitter:description" content="这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。">
@@ -319,6 +319,16 @@
 
           
             
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/03/07/读《江城》/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/03/07/读《江城》/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
           
 
           
@@ -432,6 +442,9 @@
 
           
 
+  
+    <div class="comments" id="comments">
+    </div>
   
 
 
@@ -783,6 +796,28 @@ $(function() {
 
 
 
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'i0pdUsb5eqXEw5KgksTWND1n-gzGzoHsz',
+        appKey: 'JuOE2VANC0Dd1D4R9f6oc7qn',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
 
 
 
