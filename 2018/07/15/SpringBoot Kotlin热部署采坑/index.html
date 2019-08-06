@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="热部署原理SpringBoot使用两个类加载器实现热部署(restart)。 ​    Base ClassLoader：加载不变的类，比如三方库jar ​    Restart ClassLoader：用于加载开发过程中的类 ​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷">
+<meta name="description" content="使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="自律使人自由">
+<meta property="og:title" content="SpringBoot Kotlin热部署采坑">
 <meta property="og:url" content="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/index.html">
 <meta property="og:site_name" content="自律使人自由">
-<meta property="og:description" content="热部署原理SpringBoot使用两个类加载器实现热部署(restart)。 ​    Base ClassLoader：加载不变的类，比如三方库jar ​    Restart ClassLoader：用于加载开发过程中的类 ​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷">
+<meta property="og:description" content="使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-25T13:37:11.664Z">
+<meta property="og:updated_time" content="2019-08-06T13:39:46.255Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="自律使人自由">
-<meta name="twitter:description" content="热部署原理SpringBoot使用两个类加载器实现热部署(restart)。 ​    Base ClassLoader：加载不变的类，比如三方库jar ​    Restart ClassLoader：用于加载开发过程中的类 ​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷">
+<meta name="twitter:title" content="SpringBoot Kotlin热部署采坑">
+<meta name="twitter:description" content="使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。">
 
 
 
@@ -125,7 +125,7 @@
 
 
 
-  <title> | 自律使人自由</title>
+  <title>SpringBoot Kotlin热部署采坑 | 自律使人自由</title>
   
 
 
@@ -269,7 +269,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline"></h1>
+          <h1 class="post-title" itemprop="name headline">SpringBoot Kotlin热部署采坑</h1>
         
 
         <div class="post-meta">
@@ -292,6 +292,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -309,7 +331,7 @@
 
           
           
-             <span id="/2018/07/15/SpringBoot Kotlin热部署采坑/" class="leancloud_visitors" data-flag-title="">
+             <span id="/2018/07/15/SpringBoot Kotlin热部署采坑/" class="leancloud_visitors" data-flag-title="SpringBoot Kotlin热部署采坑">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -340,7 +362,8 @@
       
 
       
-        <h3 id="热部署原理"><a href="#热部署原理" class="headerlink" title="热部署原理"></a>热部署原理</h3><p>SpringBoot使用两个类加载器实现热部署(restart)。</p>
+        <p>使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。<br><a id="more"></a></p>
+<h3 id="热部署原理"><a href="#热部署原理" class="headerlink" title="热部署原理"></a>热部署原理</h3><p>SpringBoot使用两个类加载器实现热部署(restart)。</p>
 <p>​    Base ClassLoader：加载不变的类，比如三方库jar</p>
 <p>​    Restart ClassLoader：用于加载开发过程中的类</p>
 <p>​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷启动”要快。</p>

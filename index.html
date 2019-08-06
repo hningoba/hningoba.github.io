@@ -1103,7 +1103,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/07/15/SpringBoot Kotlin热部署采坑/" itemprop="url">Untitled</a></h1>
+                <a class="post-title-link" href="/2018/07/15/SpringBoot Kotlin热部署采坑/" itemprop="url">SpringBoot Kotlin热部署采坑</a></h1>
         
 
         <div class="post-meta">
@@ -1126,6 +1126,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -1143,7 +1165,7 @@
 
           
           
-             <span id="/2018/07/15/SpringBoot Kotlin热部署采坑/" class="leancloud_visitors" data-flag-title="">
+             <span id="/2018/07/15/SpringBoot Kotlin热部署采坑/" class="leancloud_visitors" data-flag-title="SpringBoot Kotlin热部署采坑">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -1175,33 +1197,14 @@
 
       
         
-          
-            <h3 id="热部署原理"><a href="#热部署原理" class="headerlink" title="热部署原理"></a>热部署原理</h3><p>SpringBoot使用两个类加载器实现热部署(restart)。</p>
-<p>​    Base ClassLoader：加载不变的类，比如三方库jar</p>
-<p>​    Restart ClassLoader：用于加载开发过程中的类</p>
-<p>​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷启动”要快。</p>
-<p>​    如果这种启动方式还嫌不够快或是遇到了一些类加载问题，可以考虑使用例如JRebel等方法实现重新加载。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Restart vs Reload</span><br><span class="line"></span><br><span class="line">The restart technology provided by Spring Boot works by using two classloaders. Classes that do not change (for example, those from third-party jars) are loaded into a base classloader. Classes that you are actively developing are loaded into a restart classloader. When the application is restarted, the restart classloader is thrown away and a new one is created. This approach means that application restarts are typically much faster than “cold starts”, since the base classloader is already available and populated.</span><br><span class="line"></span><br><span class="line">If you find that restarts are not quick enough for your applications or you encounter classloading issues, you could consider reloading technologies such as JRebel from ZeroTurnaround. These work by rewriting classes as they are loaded to make them more amenable to reloading.</span><br></pre></td></tr></table></figure>
-<h3 id="热部署devtools不生效"><a href="#热部署devtools不生效" class="headerlink" title="热部署devtools不生效"></a>热部署devtools不生效</h3><p>​    开发过SpringBoot项目的小伙伴都知道使用devtools就能实现项目热部署，不需要每次改动都要重启项目。</p>
-<p>​    常规配置devtools比较简单，只需要在pom.xml文件中添加devtools依赖即可(maven构建方式)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;</span><br><span class="line">	&lt;optional&gt;true&lt;/optional&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-<p>​    但是，如果项目使用Kotlin作为开发语言，只添加了上述配置并不能生效，即便修改文件后控制台也显示热部署。要想生效，还需要在IDE(Intellj)加上如下两个配置：</p>
-<h5 id="1-Enable-Automake-from-the-compiler"><a href="#1-Enable-Automake-from-the-compiler" class="headerlink" title="1 - Enable Automake from the compiler"></a>1 - Enable Automake from the compiler</h5><ul>
-<li>Press: ctrl + shift + A (For Mac ⌘ + shift + A)</li>
-<li>Type: <code>make project automatically</code></li>
-<li>Hit: Enter</li>
-<li>Enable <code>Make Project automatically</code> feature</li>
-</ul>
-<h5 id="2-Enable-Automake-when-the-application-is-running"><a href="#2-Enable-Automake-when-the-application-is-running" class="headerlink" title="2 - Enable Automake when the application is running"></a>2 - Enable Automake when the application is running</h5><ul>
-<li>Press: ctrl + shift + A (For Mac ⌘ + shift + A)</li>
-<li>Type: <code>Registry</code></li>
-<li>Find the key <code>compiler.automake.allow.when.app.running</code> and <strong>enable it</strong> or <strong>click the checkbox</strong> next to it</li>
-</ul>
-<p>重启项目即可。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-devtools.html" target="_blank" rel="noopener">Developer Tools</a></p>
-<p><a href="https://stackoverflow.com/questions/12744303/intellij-idea-java-classes-not-auto-compiling-on-save" target="_blank" rel="noopener">Intellij IDEA Java classes not auto compiling on save</a></p>
-
-          
+          <p>使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/15/SpringBoot Kotlin热部署采坑/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
