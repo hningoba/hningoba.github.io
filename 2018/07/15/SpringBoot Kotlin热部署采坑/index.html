@@ -79,19 +79,17 @@
 
 
 
-<meta name="description" content="这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。">
+<meta name="description" content="热部署原理SpringBoot使用两个类加载器实现热部署(restart)。 ​    Base ClassLoader：加载不变的类，比如三方库jar ​    Restart ClassLoader：用于加载开发过程中的类 ​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷">
 <meta property="og:type" content="article">
-<meta property="og:title" content="读《江城》，作者彼得.海勒斯">
-<meta property="og:url" content="https://hningoba.github.io/2019/03/07/读《江城》，作者彼得.海勒斯/index.html">
+<meta property="og:title" content="自律使人自由">
+<meta property="og:url" content="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/index.html">
 <meta property="og:site_name" content="自律使人自由">
-<meta property="og:description" content="这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。">
+<meta property="og:description" content="热部署原理SpringBoot使用两个类加载器实现热部署(restart)。 ​    Base ClassLoader：加载不变的类，比如三方库jar ​    Restart ClassLoader：用于加载开发过程中的类 ​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://hningoba.github.io/img/江城.jpg">
-<meta property="og:updated_time" content="2019-03-07T12:50:12.903Z">
+<meta property="og:updated_time" content="2019-07-25T13:37:11.664Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="读《江城》，作者彼得.海勒斯">
-<meta name="twitter:description" content="这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。">
-<meta name="twitter:image" content="https://hningoba.github.io/img/江城.jpg">
+<meta name="twitter:title" content="自律使人自由">
+<meta name="twitter:description" content="热部署原理SpringBoot使用两个类加载器实现热部署(restart)。 ​    Base ClassLoader：加载不变的类，比如三方库jar ​    Restart ClassLoader：用于加载开发过程中的类 ​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷">
 
 
 
@@ -121,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="https://hningoba.github.io/2019/03/07/读《江城》，作者彼得.海勒斯/"/>
+  <link rel="canonical" href="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/"/>
 
 
 
 
 
-  <title>读《江城》，作者彼得.海勒斯 | 自律使人自由</title>
+  <title> | 自律使人自由</title>
   
 
 
@@ -254,7 +252,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2019/03/07/读《江城》，作者彼得.海勒斯/">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="hningoba">
@@ -271,7 +269,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">读《江城》，作者彼得.海勒斯</h1>
+          <h1 class="post-title" itemprop="name headline"></h1>
         
 
         <div class="post-meta">
@@ -283,8 +281,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-07T10:28:41+08:00">
-                2019-03-07
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-15T02:19:42+08:00">
+                2018-07-15
               </time>
             
 
@@ -294,28 +292,6 @@
           </span>
 
           
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书/" itemprop="url" rel="index">
-                    <span itemprop="name">读书</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
 
           
             
@@ -324,8 +300,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/03/07/读《江城》，作者彼得.海勒斯/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2019/03/07/读《江城》，作者彼得.海勒斯/" itemprop="commentCount"></span>
+                <a href="/2018/07/15/SpringBoot Kotlin热部署采坑/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2018/07/15/SpringBoot Kotlin热部署采坑/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -333,7 +309,7 @@
 
           
           
-             <span id="/2019/03/07/读《江城》，作者彼得.海勒斯/" class="leancloud_visitors" data-flag-title="读《江城》，作者彼得.海勒斯">
+             <span id="/2018/07/15/SpringBoot Kotlin热部署采坑/" class="leancloud_visitors" data-flag-title="">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -364,23 +340,30 @@
       
 
       
-        <p>这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。<br><a id="more"></a></p>
-<p><img src="/img/江城.jpg" style="zoom:30%"></p>
-<p>刚来这个污染严重、交通闭塞的小城，总有很多生活不习惯的地方，当地的酒文化算是其一。当然，文中提到的酒文化应该是中国特色，而不是某个地方的风俗人情。不管是出于什么目的的饭局，饭桌上肯定是少不了酒的。饭局最后倒不了几个人，也无法说明组织者的影响力和饭局的成功。酒桌上不仅能看出大家谁的酒量好坏，也看得出每个人的性格以及社会地位。这些描述跟我自己的亲身感受比较相似，中国的酒桌是一门大学问，看得出这本书确实是一本“记实”。作者在酒桌劝酒的环节，细节描写的非常有意思，值得一看。</p>
-<p>因为作者的身份问题，他在支教前后期，当地人对他的态度变化描写的也饶有趣味。但是，因为政治敏感问题，作者描述的部分场景让我非常震惊。一开始，校方对待何伟非常客气，每天酒局，好生招待。生活起居上也是各种照顾，还给他们配了中文老师。由于交通不便，涪陵很少出现外国人。所以当何伟走到街上时，总是被“当猴看”，有些不礼貌的人会有挑衅的言语，比如“洋鬼子”。相处久了之后，这种客气或好奇就没有了。有次学校篮球比赛，何伟加入了自己支教的英语系。这场比赛因为有外国人的参与，就变成了“中美大战”，球员总有种为国争光的意思，连裁判都极为偏袒（当然作者是这么说，有没有犯规不确定），使得比赛变了味。何伟的中文老师在给其授课过程中，也表现出了“你们美国，我们中国”的隔阂感。更让作者不悦的，也是让我震惊的，作者连同他的另一位美国小伙伴，一言一行、授课内容等等都被悄悄的监视和记录，不是被哪个无聊的人监视，而是。监视的执行者，可能是作者班上某个他非常喜欢、学习成绩非常好的学生。政治的封闭和对人权的亵渎，刷新了我的认知。</p>
-<p>作者也是非常硬核，文章里提到很多政治敏感问题。比如批评了新中国一些领导人缺乏治国经验，导致文化大革命、红卫兵等问题。对周总理的政治手腕、处事做法也提出了质疑。这些描述会让很多长期接受教科书意识的读者不大能接受。文章对邓小平的评价非常高，这一点和我原本的认知是一样的。可能是我之前看过邓小平传记的原因，历代领导人中，我最敬佩的就是邓小平。打江上容易守江山难。为了守好江山，推动了改革开放、废除领导职务终身制、一国两制、四个现代化、恢复高考、科教兴国等等治国方针。通过高考，从小县城走到一线城市，身处相对公平的社会环境，通过自身努力就能看到更大的世界，不得不让我感激这样的领导人。</p>
-<p>文中很长一段篇幅提到了三峡大坝。书名中的江我觉得就是长江。三峡大坝是举国工程，利弊都非常明显。比如环境破坏、淹没区、文化遗失、大量居民被迫迁移，好处是对自然资源利用的收益最大化。推动这样的工程，就需要好几代领导人共同的意志和承担风险的抗压能力。文字一般很难表达困难的真实难易度，这种大工程的推进就需要一个不接受反驳的命令。</p>
-<p>还有一个让我印象深刻的地方是，因为作者的加入，涪陵师专的学生们可以享受到真正的素质教育。作者教授他们领悟西方文学、组织英语歌剧类型的表演活动等等。对比之下，让我想到了自己年幼时接受的单调、乏味的填鸭式教育。以至于对语文、英语等非常有意思有美感的知识产生排斥。甚至高考毕业都五六年了，还会时而梦到高考答卷一片空白而惊醒。</p>
-<p>有人可能不理解看书的意义，我以前对某某某看了多少本书这样的话无感。可能我现在也觉得看多少书，不能用“本”来衡量。但是看书真真切切会给人带来说不太清楚的幸福感。而这种感觉更绵长，是和王者荣耀拿了五杀、工资涨了几千、买了双心水的小鞋子不一样的幸福感。我现在对文言文、诗词、英语已经没有了以前的恐惧感，甚至慢慢的喜欢了起来，可能这就是看书带来的一点点变化。下面是何伟老师让学生们学习的一首外文诗，罗伯特.佛罗斯特的《美景易逝》，我看的是汉译版，感觉差了点味道，把英文原版贴出来大家品味下。</p>
-<p><strong>nothing gold can stay</strong></p>
-<p>Nature’s first green is gold,</p>
-<p>Her hardest hue to hold.</p>
-<p>Her early leaf’s a flower;</p>
-<p>But only so an hour.</p>
-<p>Then leaf subsides to leaf.</p>
-<p>So Eden sank to grief,</p>
-<p>So dawn goes down to day.</p>
-<p>Nothing gold can stay.</p>
+        <h3 id="热部署原理"><a href="#热部署原理" class="headerlink" title="热部署原理"></a>热部署原理</h3><p>SpringBoot使用两个类加载器实现热部署(restart)。</p>
+<p>​    Base ClassLoader：加载不变的类，比如三方库jar</p>
+<p>​    Restart ClassLoader：用于加载开发过程中的类</p>
+<p>​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷启动”要快。</p>
+<p>​    如果这种启动方式还嫌不够快或是遇到了一些类加载问题，可以考虑使用例如JRebel等方法实现重新加载。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Restart vs Reload</span><br><span class="line"></span><br><span class="line">The restart technology provided by Spring Boot works by using two classloaders. Classes that do not change (for example, those from third-party jars) are loaded into a base classloader. Classes that you are actively developing are loaded into a restart classloader. When the application is restarted, the restart classloader is thrown away and a new one is created. This approach means that application restarts are typically much faster than “cold starts”, since the base classloader is already available and populated.</span><br><span class="line"></span><br><span class="line">If you find that restarts are not quick enough for your applications or you encounter classloading issues, you could consider reloading technologies such as JRebel from ZeroTurnaround. These work by rewriting classes as they are loaded to make them more amenable to reloading.</span><br></pre></td></tr></table></figure>
+<h3 id="热部署devtools不生效"><a href="#热部署devtools不生效" class="headerlink" title="热部署devtools不生效"></a>热部署devtools不生效</h3><p>​    开发过SpringBoot项目的小伙伴都知道使用devtools就能实现项目热部署，不需要每次改动都要重启项目。</p>
+<p>​    常规配置devtools比较简单，只需要在pom.xml文件中添加devtools依赖即可(maven构建方式)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;</span><br><span class="line">	&lt;optional&gt;true&lt;/optional&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<p>​    但是，如果项目使用Kotlin作为开发语言，只添加了上述配置并不能生效，即便修改文件后控制台也显示热部署。要想生效，还需要在IDE(Intellj)加上如下两个配置：</p>
+<h5 id="1-Enable-Automake-from-the-compiler"><a href="#1-Enable-Automake-from-the-compiler" class="headerlink" title="1 - Enable Automake from the compiler"></a>1 - Enable Automake from the compiler</h5><ul>
+<li>Press: ctrl + shift + A (For Mac ⌘ + shift + A)</li>
+<li>Type: <code>make project automatically</code></li>
+<li>Hit: Enter</li>
+<li>Enable <code>Make Project automatically</code> feature</li>
+</ul>
+<h5 id="2-Enable-Automake-when-the-application-is-running"><a href="#2-Enable-Automake-when-the-application-is-running" class="headerlink" title="2 - Enable Automake when the application is running"></a>2 - Enable Automake when the application is running</h5><ul>
+<li>Press: ctrl + shift + A (For Mac ⌘ + shift + A)</li>
+<li>Type: <code>Registry</code></li>
+<li>Find the key <code>compiler.automake.allow.when.app.running</code> and <strong>enable it</strong> or <strong>click the checkbox</strong> next to it</li>
+</ul>
+<p>重启项目即可。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-devtools.html" target="_blank" rel="noopener">Developer Tools</a></p>
+<p><a href="https://stackoverflow.com/questions/12744303/intellij-idea-java-classes-not-auto-compiling-on-save" target="_blank" rel="noopener">Intellij IDEA Java classes not auto compiling on save</a></p>
 
       
     </div>
@@ -405,8 +388,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/02/16/读《变量》，作者何帆/" rel="next" title="读《变量》，作者何帆">
-                <i class="fa fa-chevron-left"></i> 读《变量》，作者何帆
+              <a href="/2018/07/15/Android嵌套滚动NestedScrolling/" rel="next" title="Android嵌套滚动NestedScrolling">
+                <i class="fa fa-chevron-left"></i> Android嵌套滚动NestedScrolling
               </a>
             
           </div>
@@ -415,8 +398,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/03/09/读《读书与做人》，作者季羡林/" rel="prev" title="读《读书与做人》，作者季羡林">
-                读《读书与做人》，作者季羡林 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/08/12/依赖注入和控制反转(hexo)/" rel="prev" title="依赖注入和控制反转">
+                依赖注入和控制反转 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -472,8 +455,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -538,6 +530,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#热部署原理"><span class="nav-text">热部署原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#热部署devtools不生效"><span class="nav-text">热部署devtools不生效</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-Enable-Automake-from-the-compiler"><span class="nav-text">1 - Enable Automake from the compiler</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-Enable-Automake-when-the-application-is-running"><span class="nav-text">2 - Enable Automake when the application is running</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

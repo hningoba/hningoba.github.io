@@ -79,19 +79,20 @@
 
 
 
-<meta name="description" content="这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。">
+<meta name="description" content="Android通过AAPT(Android Asset Packing Tool)将各种资源集成打包并生成索引文件，即R文件。做模块化或编译优化相关工作时，需要对R文件有更多的了解，比如library module中的资源需要加resourcePrefix，做增量编译时可以只编译application module中的R文件等等。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="读《江城》，作者彼得.海勒斯">
-<meta property="og:url" content="https://hningoba.github.io/2019/03/07/读《江城》，作者彼得.海勒斯/index.html">
+<meta property="og:title" content="Android R文件相关知识">
+<meta property="og:url" content="https://hningoba.github.io/2019/08/05/Android R文件相关知识/index.html">
 <meta property="og:site_name" content="自律使人自由">
-<meta property="og:description" content="这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。">
+<meta property="og:description" content="Android通过AAPT(Android Asset Packing Tool)将各种资源集成打包并生成索引文件，即R文件。做模块化或编译优化相关工作时，需要对R文件有更多的了解，比如library module中的资源需要加resourcePrefix，做增量编译时可以只编译application module中的R文件等等。">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://hningoba.github.io/img/江城.jpg">
-<meta property="og:updated_time" content="2019-03-07T12:50:12.903Z">
+<meta property="og:image" content="https://hningoba.github.io/img/R文件结构_library.png">
+<meta property="og:image" content="https://hningoba.github.io/img/R文件结构_app.png">
+<meta property="og:updated_time" content="2019-08-06T13:26:17.334Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="读《江城》，作者彼得.海勒斯">
-<meta name="twitter:description" content="这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。">
-<meta name="twitter:image" content="https://hningoba.github.io/img/江城.jpg">
+<meta name="twitter:title" content="Android R文件相关知识">
+<meta name="twitter:description" content="Android通过AAPT(Android Asset Packing Tool)将各种资源集成打包并生成索引文件，即R文件。做模块化或编译优化相关工作时，需要对R文件有更多的了解，比如library module中的资源需要加resourcePrefix，做增量编译时可以只编译application module中的R文件等等。">
+<meta name="twitter:image" content="https://hningoba.github.io/img/R文件结构_library.png">
 
 
 
@@ -121,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://hningoba.github.io/2019/03/07/读《江城》，作者彼得.海勒斯/"/>
+  <link rel="canonical" href="https://hningoba.github.io/2019/08/05/Android R文件相关知识/"/>
 
 
 
 
 
-  <title>读《江城》，作者彼得.海勒斯 | 自律使人自由</title>
+  <title>Android R文件相关知识 | 自律使人自由</title>
   
 
 
@@ -254,7 +255,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2019/03/07/读《江城》，作者彼得.海勒斯/">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2019/08/05/Android R文件相关知识/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="hningoba">
@@ -271,7 +272,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">读《江城》，作者彼得.海勒斯</h1>
+          <h1 class="post-title" itemprop="name headline">Android R文件相关知识</h1>
         
 
         <div class="post-meta">
@@ -283,8 +284,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-07T10:28:41+08:00">
-                2019-03-07
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-08-05T11:58:06+08:00">
+                2019-08-05
               </time>
             
 
@@ -306,8 +307,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书/" itemprop="url" rel="index">
-                    <span itemprop="name">读书</span>
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
                   </a>
                 </span>
 
@@ -324,8 +325,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/03/07/读《江城》，作者彼得.海勒斯/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2019/03/07/读《江城》，作者彼得.海勒斯/" itemprop="commentCount"></span>
+                <a href="/2019/08/05/Android R文件相关知识/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/08/05/Android R文件相关知识/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -333,7 +334,7 @@
 
           
           
-             <span id="/2019/03/07/读《江城》，作者彼得.海勒斯/" class="leancloud_visitors" data-flag-title="读《江城》，作者彼得.海勒斯">
+             <span id="/2019/08/05/Android R文件相关知识/" class="leancloud_visitors" data-flag-title="Android R文件相关知识">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -364,23 +365,67 @@
       
 
       
-        <p>这本书讲的是上世纪九十年代，两个美国青年到中国涪陵支教的见闻故事。作者就是其中一位青年，他还给自己起了个非常大众化的中国名字，何伟。<br><a id="more"></a></p>
-<p><img src="/img/江城.jpg" style="zoom:30%"></p>
-<p>刚来这个污染严重、交通闭塞的小城，总有很多生活不习惯的地方，当地的酒文化算是其一。当然，文中提到的酒文化应该是中国特色，而不是某个地方的风俗人情。不管是出于什么目的的饭局，饭桌上肯定是少不了酒的。饭局最后倒不了几个人，也无法说明组织者的影响力和饭局的成功。酒桌上不仅能看出大家谁的酒量好坏，也看得出每个人的性格以及社会地位。这些描述跟我自己的亲身感受比较相似，中国的酒桌是一门大学问，看得出这本书确实是一本“记实”。作者在酒桌劝酒的环节，细节描写的非常有意思，值得一看。</p>
-<p>因为作者的身份问题，他在支教前后期，当地人对他的态度变化描写的也饶有趣味。但是，因为政治敏感问题，作者描述的部分场景让我非常震惊。一开始，校方对待何伟非常客气，每天酒局，好生招待。生活起居上也是各种照顾，还给他们配了中文老师。由于交通不便，涪陵很少出现外国人。所以当何伟走到街上时，总是被“当猴看”，有些不礼貌的人会有挑衅的言语，比如“洋鬼子”。相处久了之后，这种客气或好奇就没有了。有次学校篮球比赛，何伟加入了自己支教的英语系。这场比赛因为有外国人的参与，就变成了“中美大战”，球员总有种为国争光的意思，连裁判都极为偏袒（当然作者是这么说，有没有犯规不确定），使得比赛变了味。何伟的中文老师在给其授课过程中，也表现出了“你们美国，我们中国”的隔阂感。更让作者不悦的，也是让我震惊的，作者连同他的另一位美国小伙伴，一言一行、授课内容等等都被悄悄的监视和记录，不是被哪个无聊的人监视，而是。监视的执行者，可能是作者班上某个他非常喜欢、学习成绩非常好的学生。政治的封闭和对人权的亵渎，刷新了我的认知。</p>
-<p>作者也是非常硬核，文章里提到很多政治敏感问题。比如批评了新中国一些领导人缺乏治国经验，导致文化大革命、红卫兵等问题。对周总理的政治手腕、处事做法也提出了质疑。这些描述会让很多长期接受教科书意识的读者不大能接受。文章对邓小平的评价非常高，这一点和我原本的认知是一样的。可能是我之前看过邓小平传记的原因，历代领导人中，我最敬佩的就是邓小平。打江上容易守江山难。为了守好江山，推动了改革开放、废除领导职务终身制、一国两制、四个现代化、恢复高考、科教兴国等等治国方针。通过高考，从小县城走到一线城市，身处相对公平的社会环境，通过自身努力就能看到更大的世界，不得不让我感激这样的领导人。</p>
-<p>文中很长一段篇幅提到了三峡大坝。书名中的江我觉得就是长江。三峡大坝是举国工程，利弊都非常明显。比如环境破坏、淹没区、文化遗失、大量居民被迫迁移，好处是对自然资源利用的收益最大化。推动这样的工程，就需要好几代领导人共同的意志和承担风险的抗压能力。文字一般很难表达困难的真实难易度，这种大工程的推进就需要一个不接受反驳的命令。</p>
-<p>还有一个让我印象深刻的地方是，因为作者的加入，涪陵师专的学生们可以享受到真正的素质教育。作者教授他们领悟西方文学、组织英语歌剧类型的表演活动等等。对比之下，让我想到了自己年幼时接受的单调、乏味的填鸭式教育。以至于对语文、英语等非常有意思有美感的知识产生排斥。甚至高考毕业都五六年了，还会时而梦到高考答卷一片空白而惊醒。</p>
-<p>有人可能不理解看书的意义，我以前对某某某看了多少本书这样的话无感。可能我现在也觉得看多少书，不能用“本”来衡量。但是看书真真切切会给人带来说不太清楚的幸福感。而这种感觉更绵长，是和王者荣耀拿了五杀、工资涨了几千、买了双心水的小鞋子不一样的幸福感。我现在对文言文、诗词、英语已经没有了以前的恐惧感，甚至慢慢的喜欢了起来，可能这就是看书带来的一点点变化。下面是何伟老师让学生们学习的一首外文诗，罗伯特.佛罗斯特的《美景易逝》，我看的是汉译版，感觉差了点味道，把英文原版贴出来大家品味下。</p>
-<p><strong>nothing gold can stay</strong></p>
-<p>Nature’s first green is gold,</p>
-<p>Her hardest hue to hold.</p>
-<p>Her early leaf’s a flower;</p>
-<p>But only so an hour.</p>
-<p>Then leaf subsides to leaf.</p>
-<p>So Eden sank to grief,</p>
-<p>So dawn goes down to day.</p>
-<p>Nothing gold can stay.</p>
+        <p>Android通过AAPT(Android Asset Packing Tool)将各种资源集成打包并生成索引文件，即R文件。做模块化或编译优化相关工作时，需要对R文件有更多的了解，比如library module中的资源需要加resourcePrefix，做增量编译时可以只编译application module中的R文件等等。<br><a id="more"></a></p>
+<h3 id="application和library-module中R文件的区别"><a href="#application和library-module中R文件的区别" class="headerlink" title="application和library module中R文件的区别"></a>application和library module中R文件的区别</h3><p>结论：</p>
+<ul>
+<li>application module中的R文件的资源声明字段都是以<strong>常量</strong>形式存在，编译后使用到的资源字段以<strong>常量值</strong>的方式编译进class中。</li>
+<li>library module中的R文件的资源声明都是以<strong>变量</strong>形式存在，编译后使用到的字段会以<strong>代码引用方式</strong>编译进class中。</li>
+</ul>
+<p>​    </p>
+<p>举个例子：</p>
+<p>application module:</p>
+<p>在application module中新建MainActivity，布局文件是activity_main.xml。编译后，application module的R文件中可以看到：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public final class R &#123;</span><br><span class="line">	public static final class layout &#123;</span><br><span class="line">		public static final int activity_main=0x7f09001c;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>activity_main被final修饰，以常量形式存在。且编译后，这个field在class中的引用会被替换成常量值。</p>
+<p>MainActivity.class中R.layout.activity_main会被替换成常量值0x7f09001c，十进制为2131296284。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends AppCompatActivity &#123;</span><br><span class="line">	protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">		super.onCreate(savedInstanceState);</span><br><span class="line">		this.setContentView(2131296284);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>library module:</p>
+<p>在library module中新建SubModuleActivity，布局文件是activity_sub_module.xml。编译后，library module中的R文件是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public final class R &#123;</span><br><span class="line">	public static final class layout &#123;</span><br><span class="line">		public static int activity_sub_module = 0x7f0f001d;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>activity_sub_module没有被final修饰，以变量形式存在。</p>
+<p>编译后，SubModuleActivity.class中R.layout.activity_sub_module仍然以变量形式存在，以代码引用方式编译进class中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class SubModuleActivity extends AppCompatActivity &#123;</span><br><span class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">        super.onCreate(savedInstanceState);</span><br><span class="line">        this.setContentView(layout.activity_sub_module);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>试想下，如果library module中的R文件的资源声明也是以常量形式声明的话，代码中的资源引用会被替换成常量值。library module和application module中如果出现同名资源，根据R文件合并规则，该资源最终会以application中的资源为准，这就导致library module中代码里资源的常量值对应不到资源，报Resource NotFoundException。</p>
+<h3 id="module中R文件个数"><a href="#module中R文件个数" class="headerlink" title="module中R文件个数"></a>module中R文件个数</h3><p>​        一个module被编译时，会生成一个当前module的R文件，同时，该module依赖的module或aar也会在当前module生成R文件。这种依赖关系也包括跨层的传递依赖。所以，一个module中R文件的个数 = 其依赖的module/aar数量 + 1(自身的R文件)。</p>
+<p>​        同理，application module中包含了整个app所有模块的R.java文件。</p>
+<p>举个例子：</p>
+<p>demo项目依赖结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- app (pkg: com.tools.demo)</span><br><span class="line"> - library (pkg: com.tools.second)</span><br><span class="line">  - third (pkg: com.tools.third)</span><br></pre></td></tr></table></figure>
+<p>其中library引用了fresco。</p>
+<p>编译后，library模块中不仅包含了自身的R文件(com.tools.second.R)，还包含了依赖的module(third模块)和依赖的aar(fresco)的R文件。</p>
+<p><img src="/img/R文件结构_library.png" style="zoom:50%"></p>
+<p>app模块则包含了整个app所有模块的R文件，包括直接依赖(library)和间接依赖(third, fresco)的所有module/aar的R文件。</p>
+<p><img src="/img/R文件结构_app.png" style="zoom:50%"></p>
+<h3 id="资源合并规则"><a href="#资源合并规则" class="headerlink" title="资源合并规则"></a>资源合并规则</h3><p>APK中的资源主要有3个来源：</p>
+<ul>
+<li>The main source set (generally located in  src/main/res/)</li>
+<li>Build variant source sets</li>
+<li>Android libraries (AARs)</li>
+</ul>
+<p>​        一个资源文件的文件名在resource type (anim/drawable/layout/menu..) 和 resource qualifier (比如drawable中的hdpi、value中的语言) 目录内是唯一的话，这个资源就被认为是唯一的。</p>
+<p>​        资源文件冲突时，按照下面的优先级进行合并，低优的资源会被覆盖。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">build variant &gt; build type &gt; product flavor &gt; main source set &gt; library dependencies</span><br></pre></td></tr></table></figure>
+<p>比如：main source set包含以下资源：</p>
+<ul>
+<li>res/layout/foo.xml</li>
+<li>res/layout-land/foo.xml</li>
+</ul>
+<p>debug build type包含：</p>
+<ul>
+<li>res/layout/foo.xml</li>
+</ul>
+<p>最终APK文件中的<code>res/layout/foo.xml</code>来自debug build type，<code>res/layout-land/foo.xml</code>来自main source set。</p>
+<h5 id="build-variant："><a href="#build-variant：" class="headerlink" title="build variant："></a>build variant：</h5><p>​    build variant可以认为是build type和product flavor的结合。Gradle 会根据build type和product flavor自动创建build variant，并按照 <code>&lt;product-flavor&gt;&lt;Build-Type&gt;</code> 的格式命名这些变体。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    ...</span><br><span class="line">    defaultConfig &#123;...&#125;</span><br><span class="line">    </span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        debug&#123;...&#125;</span><br><span class="line">        release&#123;...&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        internal &#123;...&#125;</span><br><span class="line">        googlePlay &#123;...&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    根据上述配置，gradle会构建以下build variant：</p>
+<ul>
+<li>internalDebug</li>
+<li>internalRelease</li>
+<li>googlePlayDebug</li>
+<li>googlePlayRelease</li>
+</ul>
+<p>参考：</p>
+<p><a href="https://developer.android.com/studio/write/add-resources.html#resource_merging" target="_blank" rel="noopener">Android Resource merging</a></p>
 
       
     </div>
@@ -405,8 +450,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/02/16/读《变量》，作者何帆/" rel="next" title="读《变量》，作者何帆">
-                <i class="fa fa-chevron-left"></i> 读《变量》，作者何帆
+              <a href="/2019/03/09/读《读书与做人》，作者季羡林/" rel="next" title="读《读书与做人》，作者季羡林">
+                <i class="fa fa-chevron-left"></i> 读《读书与做人》，作者季羡林
               </a>
             
           </div>
@@ -414,10 +459,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/03/09/读《读书与做人》，作者季羡林/" rel="prev" title="读《读书与做人》，作者季羡林">
-                读《读书与做人》，作者季羡林 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -472,8 +513,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -538,6 +588,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#application和library-module中R文件的区别"><span class="nav-text">application和library module中R文件的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#module中R文件个数"><span class="nav-text">module中R文件个数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#资源合并规则"><span class="nav-text">资源合并规则</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#build-variant："><span class="nav-text">build variant：</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
