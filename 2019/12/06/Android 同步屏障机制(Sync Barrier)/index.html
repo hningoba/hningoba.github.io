@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="自律使人自由">
 <meta property="og:description" content="Android中的同步屏障机制本质上是让消息队列优先处理异步消息。在View渲染方面就是通过这种机制优先处理界面层相关任务。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-12-06T10:09:18.002Z">
+<meta property="og:updated_time" content="2019-12-07T07:16:54.549Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android 同步屏障机制(Sync Barrier)">
 <meta name="twitter:description" content="Android中的同步屏障机制本质上是让消息队列优先处理异步消息。在View渲染方面就是通过这种机制优先处理界面层相关任务。">
@@ -340,10 +340,10 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">android.os.Handler.java</span><br><span class="line"></span><br><span class="line">private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis) &#123;</span><br><span class="line">				// target是当前Handler。</span><br><span class="line">				msg.target = this;</span><br><span class="line">        if (mAsynchronous) &#123;</span><br><span class="line">            msg.setAsynchronous(true);</span><br><span class="line">        &#125;</span><br><span class="line">        return queue.enqueueMessage(msg, uptimeMillis);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <p>但是，通过MessageQueue.postSyncBarrier()设置同步屏障时，Message的target并没有赋值，即为null。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">android.os.MessageQueue.java</span><br><span class="line"></span><br><span class="line">public int postSyncBarrier() &#123;</span><br><span class="line">        return postSyncBarrier(SystemClock.uptimeMillis());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private int postSyncBarrier(long when) &#123;</span><br><span class="line">        // Enqueue a new sync barrier token.</span><br><span class="line">        // We don&apos;t need to wake the queue because the purpose of a barrier is to stall it.</span><br><span class="line">        synchronized (this) &#123;</span><br><span class="line">            final int token = mNextBarrierToken++;</span><br><span class="line">            final Message msg = Message.obtain();</span><br><span class="line">            msg.markInUse();</span><br><span class="line">            // 屏障消息只设置了when和arg1</span><br><span class="line">            msg.when = when;</span><br><span class="line">            msg.arg1 = token;</span><br><span class="line">						...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>所以，同步屏障本质上是在消息队列中入队了一个target为空的Message。该机制和同步、异步消息有什么关系呢？</p>
-<h3 id="异步消息处理"><a href="#异步消息处理" class="headerlink" title="异步消息处理"></a>异步消息处理</h3><p>消息轮询时会调用下面方法。</p>
+<p>所以，同步屏障本质上是在消息队列中入队了一个target为空的Message。那么同步屏障机制和同步、异步消息有什么关系呢？</p>
+<h3 id="异步消息处理"><a href="#异步消息处理" class="headerlink" title="异步消息处理"></a>异步消息处理</h3><p>Looper.loop()进行消息轮询时会调用下面方法。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">android.os.MessageQueue.java</span><br><span class="line"></span><br><span class="line">Message next() &#123;</span><br><span class="line">        ...</span><br><span class="line">        for (;;) &#123;</span><br><span class="line">            ...</span><br><span class="line"></span><br><span class="line">            synchronized (this) &#123;</span><br><span class="line">                // Try to retrieve the next message.  Return if found.</span><br><span class="line">                final long now = SystemClock.uptimeMillis();</span><br><span class="line">                Message prevMsg = null;</span><br><span class="line">                Message msg = mMessages;</span><br><span class="line">                // 发现了同步屏障消息</span><br><span class="line">                if (msg != null &amp;&amp; msg.target == null) &#123;</span><br><span class="line">                    // Stalled by a barrier.  Find the next asynchronous message in the queue.</span><br><span class="line">                    // 如果是同步消息则继续找，直到找到异步消息</span><br><span class="line">                    do &#123;</span><br><span class="line">                        prevMsg = msg;</span><br><span class="line">                        msg = msg.next;</span><br><span class="line">                    &#125; while (msg != null &amp;&amp; !msg.isAsynchronous());</span><br><span class="line">                &#125;</span><br><span class="line">                ...</span><br><span class="line">                return msg;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>简单来说，就是找下一个要执行的消息时，如果发现了同步屏障，则往下找异步消息。所以有同步屏障机制下，Handler只会处理异步消息。</p>
+<p>简单来说，就是找下一个要执行的消息时，如果发现了同步屏障，则往下找异步消息。所以有同步屏障时，Handler只会处理异步消息。</p>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
 <li>同步屏障本质上是一个target为空的Message；</li>
 <li>消息轮询时，如果发现了同步屏障消息，则只处理异步消息，所以Android通过这种方式保证UI渲染任务优先处理。</li>
@@ -372,7 +372,7 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/11/28/Android图形渲染之Choreographer原理/" rel="next" title="Android图形渲染之Choreographer原理">
+              <a href="/2019/11/28/Android Choreographer原理/" rel="next" title="Android图形渲染之Choreographer原理">
                 <i class="fa fa-chevron-left"></i> Android图形渲染之Choreographer原理
               </a>
             
@@ -523,7 +523,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
