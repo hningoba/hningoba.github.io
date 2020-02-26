@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="​    在使用着色器绘制图形时都要执行的着色器和程序的创建、链接相关流程。本文主要来源于《OpenGL ES 3.0编程指南》第四章。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenGL着色器和程序">
+<meta property="og:url" content="https://hningoba.github.io/2019/07/29/OpenGL着色器和程序/index.html">
+<meta property="og:site_name" content="自律使人自由">
+<meta property="og:description" content="​    在使用着色器绘制图形时都要执行的着色器和程序的创建、链接相关流程。本文主要来源于《OpenGL ES 3.0编程指南》第四章。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-02-26T14:12:03.174Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenGL着色器和程序">
+<meta name="twitter:description" content="​    在使用着色器绘制图形时都要执行的着色器和程序的创建、链接相关流程。本文主要来源于《OpenGL ES 3.0编程指南》第四章。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://hningoba.github.io/2019/07/29/OpenGL着色器和程序/"/>
+
+
+
+
+
+  <title>OpenGL着色器和程序 | 自律使人自由</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">自律使人自由</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2019/07/29/OpenGL着色器和程序/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hningoba">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律使人自由">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OpenGL着色器和程序</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-07-29T21:01:14+08:00">
+                2019-07-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>​    在使用着色器绘制图形时都要执行的着色器和程序的创建、链接相关流程。本文主要来源于《OpenGL ES 3.0编程指南》第四章。<br><a id="more"></a></p>
+<p>​    需要创建两个基本对象才能使用着色器进行渲染：着色器对象、程序对象。理解着色器对象和程序对象的最佳方式是将它们比作C语言的编译器和链接程序。C编译器为一段源代码生成目标代码（例如.obj或者.o文件）。创建目标文件之后，C链接程序将对象文件链接为最后的程序。</p>
+<p>​    OpenGL ES在着色器方面使用类似范式。着色器对象是包含单个着色器的对象。源代码提供给着色器对象，然后着色器对象被编译为一个目标形式（类似于.obj文件）。编译之后，着色器对象可以连接到一个程序对象。程序对象可以连接多个着色器对象。在OpenGL ES中，每个程序对象必须连接一个顶点着色器和一个片段着色器（不多也不少）。最后，程序对象被链接为用于渲染的最后“可执行程序”。（这里注意连接和链接的区分）</p>
+<h3 id="着色器对象链接步骤"><a href="#着色器对象链接步骤" class="headerlink" title="着色器对象链接步骤"></a>着色器对象链接步骤</h3><p>​    获取链接后的着色器对象的过程，一般包括下面6个步骤：</p>
+<ol>
+<li>创建一个顶点着色器对象和片段着色器对象</li>
+<li>将源代码连接到每个着色器对象</li>
+<li>编译着色器对象</li>
+<li>创建一个程序对象</li>
+<li>将编译后的着色器对象连接到程序对象</li>
+<li>链接程序对象</li>
+</ol>
+<p>上述步骤的示例代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">// 顶点着色器源代码</span><br><span class="line">private final String vertexShaderCode =</span><br><span class="line">            &quot;attribute vec4 vPosition;&quot; +</span><br><span class="line">                    &quot;void main() &#123;&quot; +</span><br><span class="line">                    &quot;  gl_Position = vPosition;&quot; +</span><br><span class="line">                    &quot;&#125;&quot;;</span><br><span class="line"></span><br><span class="line">// 片段着色器源代码</span><br><span class="line">private final String fragmentShaderCode =</span><br><span class="line">            &quot;precision mediump float;&quot; +</span><br><span class="line">                    &quot;uniform vec4 vColor;&quot; +</span><br><span class="line">                    &quot;void main() &#123;&quot; +</span><br><span class="line">                    &quot;  gl_FragColor = vColor;&quot; +</span><br><span class="line">                    &quot;&#125;&quot;;</span><br><span class="line"></span><br><span class="line">// step1, 创建一个顶点着色器对象。glCreateShader()返回着色器对象句柄</span><br><span class="line">int vertexShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);</span><br><span class="line"></span><br><span class="line">// step2, 将源代码连接到着色器对象</span><br><span class="line">GLES20.glShaderSource(vertexShader, vertexShaderCode);</span><br><span class="line"></span><br><span class="line">// step3, 编译着色器对象</span><br><span class="line">GLES20.glCompileShader(vertexShader);</span><br><span class="line"></span><br><span class="line">// 片段着色器创建、编译过程和顶点着色器一样，step1~step3</span><br><span class="line">int fragmentShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);</span><br><span class="line">GLES20.glShaderSource(fragmentShader, fragmentShaderCode);</span><br><span class="line">GLES20.glCompileShader(fragmentShader);</span><br><span class="line"></span><br><span class="line">// step4, 创建一个程序对象。glCreateProgram()返回程序对象的句柄</span><br><span class="line">int mProgram = GLES20.glCreateProgram();</span><br><span class="line"></span><br><span class="line">//step5, 将顶点着色器加入到程序</span><br><span class="line">GLES20.glAttachShader(mProgram, vertexShader);</span><br><span class="line"></span><br><span class="line">//step5, 将片元着色器加入到程序中</span><br><span class="line">GLES20.glAttachShader(mProgram, fragmentShader);</span><br><span class="line"></span><br><span class="line">//step6, 链接程序对象</span><br><span class="line">GLES20.glLinkProgram(mProgram);</span><br><span class="line"></span><br><span class="line">// 异常检测：检查链接是否成功</span><br><span class="line">int[] status = new int[1];</span><br><span class="line">GLES20.glGetProgramiv(mProgram, GLES20.GL_LINK_STATUS, status, 0);</span><br><span class="line">if (status[0] == GLES20.GL_FALSE) &#123;</span><br><span class="line">	Log.e(TAG, &quot;link shader error:&quot; + GLES20.glGetProgramInfoLog(mProgram));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 一般上述步骤完成后，还需要下面步骤将创建的程序对象设置为活动程序</span><br><span class="line">GLES20.glUseProgram(mProgram);</span><br></pre></td></tr></table></figure>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><p>以创建三角形为例，走下上述创建着色器对象并链接程序的过程，每一步都有基本的注释。对细节不是特别清楚的可以参考这个网站，入门OpenGL非常好的一个<a href="https://learnopengl-cn.github.io/01 Getting started/04 Hello Triangle/" target="_blank" rel="noopener">教程网站</a>)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">class TriangleRenderer : BaseRenderer() &#123;</span><br><span class="line"></span><br><span class="line">    private val vertextShaderCode =</span><br><span class="line">            &quot;attribute vec4 vPosition;&quot; +</span><br><span class="line">                    &quot;void main() &#123;&quot; +</span><br><span class="line">                    &quot;   gl_Position = vPosition;&quot; +</span><br><span class="line">                    &quot;&#125;&quot;</span><br><span class="line"></span><br><span class="line">    private val fragmentShaderCode =</span><br><span class="line">            &quot;precision mediump float;&quot; +</span><br><span class="line">                    &quot;uniform vec4 vColor;&quot; +</span><br><span class="line">                    &quot;void main() &#123;&quot; +</span><br><span class="line">                    &quot;   gl_FragColor = vColor;&quot; +</span><br><span class="line">                    &quot;&#125;&quot;</span><br><span class="line"></span><br><span class="line">    private val vertexVecSize = 3 // 每个顶点矢量的坐标分量，因为是三维，所以是3</span><br><span class="line">    private val triangleCoordinate = floatArrayOf(</span><br><span class="line">            0f, 0.5f, 0f,</span><br><span class="line">            -0.5f, -0.5f, 0f,</span><br><span class="line">            0.5f, -0.5f, 0f</span><br><span class="line">    )</span><br><span class="line">    private var vertexBuffer: FloatBuffer? = null</span><br><span class="line">    private var triangleColor = floatArrayOf(1f, 1f, 1f, 0f)</span><br><span class="line">    private val sizeOfFloat = 4	// Float是4个字节</span><br><span class="line">    private var mProgram = -1</span><br><span class="line"></span><br><span class="line">    override fun onInit() &#123;</span><br><span class="line">        // 准备顶点数据</span><br><span class="line">        val bb = ByteBuffer.allocateDirect(triangleCoordinate.size * sizeOfFloat)</span><br><span class="line">        bb.order(ByteOrder.nativeOrder())</span><br><span class="line">        vertexBuffer = bb.asFloatBuffer()</span><br><span class="line">        vertexBuffer?.put(triangleCoordinate)</span><br><span class="line">        vertexBuffer?.position(0)</span><br><span class="line"></span><br><span class="line">        // 编译vertexShader和fragmentShader</span><br><span class="line">        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertextShaderCode)</span><br><span class="line">        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)</span><br><span class="line"></span><br><span class="line">        // 将着色器加入程序</span><br><span class="line">        mProgram = GLES20.glCreateProgram()</span><br><span class="line">        GLES20.glAttachShader(mProgram, vertexShader)</span><br><span class="line">        GLES20.glAttachShader(mProgram, fragmentShader)</span><br><span class="line"></span><br><span class="line">        // 链接程序</span><br><span class="line">        GLES20.glLinkProgram(mProgram)</span><br><span class="line">        checkLinkProgramStatus(mProgram)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    override fun onDrawFrame(gl: GL10) &#123;</span><br><span class="line">        super.onDrawFrame(gl)</span><br><span class="line">        // 使用程序</span><br><span class="line">        GLES20.glUseProgram(mProgram)</span><br><span class="line"></span><br><span class="line">        // 找到顶点坐标（attribute变量）的句柄，并对其赋值</span><br><span class="line">        val positionLocation = GLES20.glGetAttribLocation(mProgram, &quot;vPosition&quot;)</span><br><span class="line">        GLES20.glEnableVertexAttribArray(positionLocation)</span><br><span class="line">        GLES20.glVertexAttribPointer(positionLocation, 3, GLES20.GL_FLOAT, false, 3 * sizeOfFloat, vertexBuffer)</span><br><span class="line"></span><br><span class="line">        // 找到片段颜色（uniform变量）的句柄，并对其赋值</span><br><span class="line">        val colorLocation = GLES20.glGetUniformLocation(mProgram, &quot;vColor&quot;)</span><br><span class="line">        GLES20.glUniform4fv(colorLocation, 1, triangleColor, 0)</span><br><span class="line"></span><br><span class="line">        // 绘制三角形</span><br><span class="line">        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, triangleCoordinate.size/vertexVecSize)</span><br><span class="line">        GLES20.glDisableVertexAttribArray(positionLocation)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Renderer基类包含一部分检查工作，比如着色器是否创建成功、程序是否链接成功。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">abstract class BaseRenderer: GLSurfaceView.Renderer &#123;</span><br><span class="line"></span><br><span class="line">    private val TAG = this.javaClass.simpleName</span><br><span class="line"></span><br><span class="line">    fun loadShader(type: Int, shaderCode: String): Int &#123;</span><br><span class="line">        //根据type创建顶点着色器或者片元着色器</span><br><span class="line">        val shader = GLES20.glCreateShader(type)</span><br><span class="line">        //将着色器源代码连接到着色器对象上</span><br><span class="line">        GLES20.glShaderSource(shader, shaderCode)</span><br><span class="line">        //编译着色器对象</span><br><span class="line">        GLES20.glCompileShader(shader)</span><br><span class="line">        checkShaderCompileStatus(shader, type)</span><br><span class="line">        return shader</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    abstract fun onInit()</span><br><span class="line"></span><br><span class="line">    override fun onSurfaceCreated(gl: GL10, config: EGLConfig) &#123;</span><br><span class="line">        gl.glClearColor(0.3f, 0.3f, 0.3f, 0.7f)</span><br><span class="line">        onInit()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) &#123;</span><br><span class="line">        GLES20.glViewport(0, 0, width, height)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    override fun onDrawFrame(gl: GL10) &#123;</span><br><span class="line">        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 检查着色器编译是否成功</span><br><span class="line">     */</span><br><span class="line">    fun checkShaderCompileStatus(shader: Int, shaderType: Int) &#123;</span><br><span class="line">        val status = IntArray(1)</span><br><span class="line">        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, status, 0)</span><br><span class="line">        if (status[0] == GLES20.GL_FALSE) &#123;</span><br><span class="line">            Log.e(TAG, &quot;shader compile error, shader type: $shaderType; log: $&#123;GLES20.glGetShaderInfoLog(shader)&#125;&quot;)</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            Log.d(TAG, &quot;shader compile success&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 检查程序链接是否成功</span><br><span class="line">     */</span><br><span class="line">    fun checkLinkProgramStatus(program: Int) &#123;</span><br><span class="line">        val status = IntArray(1)</span><br><span class="line">        GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, status, 0)</span><br><span class="line">        if (status[0] == GLES20.GL_FALSE) &#123;</span><br><span class="line">            Log.e(TAG, &quot;link shader error:$&#123;GLES20.glGetProgramInfoLog(program)&#125;&quot;)</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            Log.d(TAG, &quot;link shader success&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/09/读《读书与做人》，作者季羡林/" rel="next" title="读《读书与做人》，作者季羡林">
+                <i class="fa fa-chevron-left"></i> 读《读书与做人》，作者季羡林
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/29/OpenGL变量uniform、attribute和varying/" rel="prev" title="OpenGL变量uniform、attribute和varying">
+                OpenGL变量uniform、attribute和varying <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">hningoba</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#着色器对象链接步骤"><span class="nav-text">着色器对象链接步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例代码"><span class="nav-text">示例代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hningoba</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -79,19 +79,17 @@
 
 
 
-<meta name="description" content="《变量》2019年春节后看完的第一本书，作者何帆。买这本书源于逻辑思维公众号的推荐。书内容不算太长，一共五章。">
+<meta name="description" content="本篇文章主要梳理下OpenGL几种变量的区别。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="读《变量》，作者何帆">
-<meta property="og:url" content="https://hningoba.github.io/2019/02/16/读《变量》，作者何帆/index.html">
+<meta property="og:title" content="OpenGL变量uniform、attribute和varying">
+<meta property="og:url" content="https://hningoba.github.io/2019/07/29/OpenGL变量uniform、attribute和varying/index.html">
 <meta property="og:site_name" content="自律使人自由">
-<meta property="og:description" content="《变量》2019年春节后看完的第一本书，作者何帆。买这本书源于逻辑思维公众号的推荐。书内容不算太长，一共五章。">
+<meta property="og:description" content="本篇文章主要梳理下OpenGL几种变量的区别。">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://hningoba.github.io/img/变量-何帆.png">
-<meta property="og:updated_time" content="2019-03-07T12:36:27.188Z">
+<meta property="og:updated_time" content="2020-02-26T14:08:03.586Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="读《变量》，作者何帆">
-<meta name="twitter:description" content="《变量》2019年春节后看完的第一本书，作者何帆。买这本书源于逻辑思维公众号的推荐。书内容不算太长，一共五章。">
-<meta name="twitter:image" content="https://hningoba.github.io/img/变量-何帆.png">
+<meta name="twitter:title" content="OpenGL变量uniform、attribute和varying">
+<meta name="twitter:description" content="本篇文章主要梳理下OpenGL几种变量的区别。">
 
 
 
@@ -121,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="https://hningoba.github.io/2019/02/16/读《变量》，作者何帆/"/>
+  <link rel="canonical" href="https://hningoba.github.io/2019/07/29/OpenGL变量uniform、attribute和varying/"/>
 
 
 
 
 
-  <title>读《变量》，作者何帆 | 自律使人自由</title>
+  <title>OpenGL变量uniform、attribute和varying | 自律使人自由</title>
   
 
 
@@ -244,7 +242,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2019/02/16/读《变量》，作者何帆/">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2019/07/29/OpenGL变量uniform、attribute和varying/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="hningoba">
@@ -261,7 +259,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">读《变量》，作者何帆</h1>
+          <h1 class="post-title" itemprop="name headline">OpenGL变量uniform、attribute和varying</h1>
         
 
         <div class="post-meta">
@@ -273,8 +271,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-02-16T23:30:00+08:00">
-                2019-02-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-07-29T21:01:14+08:00">
+                2019-07-29
               </time>
             
 
@@ -296,8 +294,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书/" itemprop="url" rel="index">
-                    <span itemprop="name">读书</span>
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
                   </a>
                 </span>
 
@@ -333,14 +331,23 @@
       
 
       
-        <p>《变量》2019年春节后看完的第一本书，作者何帆。买这本书源于逻辑思维公众号的推荐。书内容不算太长，一共五章。<br><a id="more"></a></p>
-<p><img src="/img/变量-何帆.png" style="zoom:40%"></p>
-<p>第一章“怎样观察一棵树”。作者提到了大趋势、小趋势和快变量、慢变量的概念。我理解是身边处处是变化，是快变量。我们要能站在更高、更长远的角度看待时代的变化，不能拘泥于眼前的短期问题。就像做项目，我有时也会被每个周期的工作需求折腾到不会思考，不会思考项目的合理性、发展方向，当前做的工作对项目的长远发展是真有帮助还是无用功。每天都在忙需求，产品质量又怎样了呢，对自己的成长和职业发展帮助在哪里呢。是否可以换个角度，看长远点，该做减法时做减法，该沉淀时当沉淀。</p>
-<p>第二章“在无人地带寻找无人机”，讲的是近几年比较火的无人机领域。大家比较熟悉的无人机场景大多是城市里公共活动场所，年轻人拿着遥控器当玩具玩。又或是短视频APP里，用无人机拍摄的旅行、运动等短片。但是这一章提到的是无人机在农业的应用。一批年轻人用无人机帮助农民撒农药，数百亩农田，短短十几天就能完工。原本给人感觉劳动密集型、粗放的农业，能跟新潮的无人机搭上腔。这让我想到德国的屠宰场全自动流水线、美国的自动摘果机。期待国内农业更加高度的自动化，更多好玩的东西加如到农业领域。</p>
-<p>第三章“老兵不死”，表扬了传统型企业努力跟上新时代的脚步，努力转型的故事。文中以海尔为例，说的是海尔怎么把传统型酒柜被慢慢改造成一个智能化的平台，其实这个也是互联网+概念的一个案例。老兵不断学习，自我更新。新兵当然也有向老兵学习的必要性。比如近两年的互联网造车潮，纯互联网企业不依托传统车企的制造厂、流水线等，永远都只能“云”造车。但是互联网公司自建工厂，又会把自身变成重资产型企业，像乐视一样，让自己拖入资金匮乏的泥沼。所以现时代，需要新兵、老兵互相借鉴，携手共进。</p>
-<p>第四章“在菜市场遇见城市设计师”。对东莞这个城市的例子印象比较深。东莞市没有县，市下面直接就是镇，有点去中心化的概念。这种去中性化其实会让城市更高效。就像上海和北京的对比。上海的一个个小片区，自成系统，不会造成单点集中式的拥堵。北京则不一样，是从一环往外，单点辐射，交通比上海可堵的严重多了。</p>
-<p>第五章“阿那亚和范家小学”。阿那亚是北戴河的一个小区。有意思的是，这个小区是暖洋洋的，邻居间互动很多，像一个大社区，比如有些业主会很宽心的把自家孩子寄放到小区的咖啡馆里。小区的房子大多是北京人买的。这些人在阿那亚更有生活的感觉，这里是这些人的第二人生，而北京的生活是第一人生。第一人生为生存忙碌，同时养着第二人生。而第二人生感受着生活的意义，滋补着第一人生。<br><br>范家小学，一个大山里的小学，条件不好，学生不多。这就天然成了小班，师生更多互动，每个学生得到的关爱更多。这类学校因为高考对他们相对有点“远”，索性就更注重素质教育，比如要求学生有兴趣爱好、表达要求等等。相对的，大城市的学校更多的是针对高考的模板教育。</p>
-<p>这本书提到的例子都是近几年新出的元素，紧跟时代步伐。所以，做IT的我看到这本书就感觉很亲切。看每一章时都会有一些思考，也有很多共鸣。总体来说是一本不错的书，推荐指数4.5星。</p>
+        <p>本篇文章主要梳理下OpenGL几种变量的区别。</p>
+<a id="more"></a>
+<p>下面是一段顶点、片段着色器代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">private final String vertexShaderCode =</span><br><span class="line">           &quot;attribute vec4 vPosition;&quot; +</span><br><span class="line">                   &quot;uniform mat4 vMatrix;&quot;+</span><br><span class="line">                   &quot;varying  vec4 vColor;&quot;+</span><br><span class="line">                   &quot;attribute vec4 aColor;&quot;+</span><br><span class="line">                   &quot;void main() &#123;&quot; +</span><br><span class="line">                   &quot;  gl_Position = vMatrix*vPosition;&quot; +</span><br><span class="line">                   &quot;  vColor=aColor;&quot;+</span><br><span class="line">                   &quot;&#125;&quot;;</span><br><span class="line"></span><br><span class="line">   private final String fragmentShaderCode =</span><br><span class="line">           &quot;precision mediump float;&quot; +</span><br><span class="line">                   &quot;varying vec4 vColor;&quot; +</span><br><span class="line">                   &quot;void main() &#123;&quot; +</span><br><span class="line">                   &quot;  gl_FragColor = vColor;&quot; +</span><br><span class="line">                   &quot;&#125;&quot;;</span><br></pre></td></tr></table></figure>
+<h3 id="统一变量uniform"><a href="#统一变量uniform" class="headerlink" title="统一变量uniform"></a>统一变量uniform</h3><p>统一变量相当于应用程序传递给着色器（vertex、fragment）的只读值，即常量。</p>
+<p>uniform一般用来表示变换矩阵、照明参数、颜色等，比如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">uniform mat4 viewProjMatrix;	// 投影观察矩阵</span><br><span class="line">uniform mat4 viewMatrix;			// 观察矩阵</span><br><span class="line">uniform vec3 lightPosition;		// 光源坐标</span><br></pre></td></tr></table></figure>
+<p>统一变量的命名空间在顶点着色器和片段着色器中是共享的。也就是说，如果顶点和片段着色器一起链接到一个程序对象，它们就会共享同一组统一变量，前提是要求uniform变量在vertex和fragment两者之间声明方式完全一样。</p>
+<p>程序中一般通过glUniform*()给统一变量赋值。比如开头示例代码中，顶点着色器的vMatrix：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 找到变量索引</span><br><span class="line">int mMatrixHandler= GLES20.glGetUniformLocation(mProgram,&quot;vMatrix&quot;);</span><br><span class="line">// 给变量赋值，其中mMVPMatrix是提前算好的变换矩阵</span><br><span class="line">GLES20.glUniformMatrix4fv(mMatrixHandler,1,false,mMVPMatrix,0);</span><br></pre></td></tr></table></figure>
+<h3 id="属性attribute"><a href="#属性attribute" class="headerlink" title="属性attribute"></a>属性attribute</h3><p>attribute变量只能用在顶点着色器中，不能再片段着色器中声明或使用。</p>
+<p>attribute一般用来表示顶点相关的数据，比如顶点坐标、顶点法线、纹理坐标、顶点颜色等。</p>
+<p>程序中一般用glGetAttribLocation、glBindAttribLocation等获取attribute变量的索引，再用glVertexAttribPointer给变量赋值。比如开头示例中顶点着色器中的vPosition：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 获取变量索引</span><br><span class="line">int mPositionHandle = GLES20.glGetAttribLocation(mProgram, &quot;vPosition&quot;);</span><br><span class="line">// 给变量赋值</span><br><span class="line">GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX,</span><br><span class="line">                GLES20.GL_FLOAT, false, vertexStride, vertexBuffer);</span><br></pre></td></tr></table></figure>
+<h3 id="变量varying"><a href="#变量varying" class="headerlink" title="变量varying"></a>变量varying</h3><p>varying变量一般用于顶点着色器和片段着色器之间数据传递。一般在顶点着色器中对varying变量赋值，片段着色器中使用该变量。</p>
+<p>varying变量的声明在顶点着色器和片段着色器中必须一致。且varying变量的赋值一般是通过一个attribute变量对齐赋值，比如示例代码中的vColor。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&quot;varying  vec4 vColor;&quot;+</span><br><span class="line">&quot;attribute vec4 aColor;&quot;+</span><br><span class="line">&quot;void main() &#123;&quot; +</span><br><span class="line">&quot;  vColor=aColor;&quot;+</span><br><span class="line">&quot;&#125;&quot;;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -365,8 +372,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/08/12/依赖注入和控制反转(hexo)/" rel="next" title="依赖注入和控制反转">
-                <i class="fa fa-chevron-left"></i> 依赖注入和控制反转
+              <a href="/2019/07/29/OpenGL着色器和程序/" rel="next" title="OpenGL着色器和程序">
+                <i class="fa fa-chevron-left"></i> OpenGL着色器和程序
               </a>
             
           </div>
@@ -375,8 +382,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/03/07/读《江城》，作者彼得.海勒斯/" rel="prev" title="读《江城》，作者彼得.海勒斯">
-                读《江城》，作者彼得.海勒斯 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/08/05/Android R文件相关知识/" rel="prev" title="Android R文件相关知识">
+                Android R文件相关知识 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -429,8 +436,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -481,6 +497,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#统一变量uniform"><span class="nav-text">统一变量uniform</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#属性attribute"><span class="nav-text">属性attribute</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量varying"><span class="nav-text">变量varying</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
