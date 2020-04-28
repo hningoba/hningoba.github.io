@@ -86,16 +86,17 @@
 <meta property="og:site_name" content="自律使人自由">
 <meta property="og:description" content="本文主要介绍Matrix的Trace部分，主要涉及帧率、ANR、慢函数、启动耗时的检测逻辑。">
 <meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix-tracer.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_anr_log.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_evil_mthod_log.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_StartupTracer_field_annotation.png">
 <meta property="og:image" content="https://hningoba.github.io/2020/04/28/Matrix-TraceCanary实现分析/matrix_ActivityThreadHacker_method_trace.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_TestTraceMainActivity_dex.png">
-<meta property="og:updated_time" content="2020-04-28T10:47:51.709Z">
+<meta property="og:updated_time" content="2020-04-28T11:11:47.071Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Matrix-TraceCanary实现分析">
 <meta name="twitter:description" content="本文主要介绍Matrix的Trace部分，主要涉及帧率、ANR、慢函数、启动耗时的检测逻辑。">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_anr_log.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix-tracer.png">
 
 
 
@@ -345,9 +346,9 @@
 <li>准确的定位到发生卡顿的函数，提供执行堆栈、执行耗时、执行次数等信息，帮助快速解决卡顿问题</li>
 <li>自动涵盖卡顿、启动耗时、页面切换、慢函数检测等多个流畅性指标</li>
 </ul>
-<p>看下Tracer模块的类继承关系：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- Tracer</span><br><span class="line">	- FrameTracer</span><br><span class="line">	- AnrTracer</span><br><span class="line">	- EvilMethodTracer</span><br><span class="line">	- StratupTracer</span><br></pre></td></tr></table></figure>
-<p>通过类名就能看出来每个类的大体功能，下面逐个介绍。</p>
+<p>Tracer模块主要结构：</p>
+<p><img src="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix-tracer.png" style="zoom:67%;"></p>
+<p>其中，FrameTracer负责帧率检测，AnrTracer负责ANR问题检测，EvilMethodTracer负责检测慢函数，StartupTracer负责应用启动耗时检测。</p>
 <h3 id="帧率检测"><a href="#帧率检测" class="headerlink" title="帧率检测"></a>帧率检测</h3><p>FrameTracer部分主要做帧率、掉帧、帧耗时等检测，具体实现逻辑在FrameTracer和UIThreadMonitor。</p>
 <p>Demo中是在TestFpsActivity做的演示，onCreate()中通过FrameTracer.onStartTrace()开启检测，页面退出时通过FrameTracer.onCloseTrace()结束检测，并移除监控回调。</p>
 <p>我们按照调用栈倒序的逻辑，从使用侧开始，看看具体帧率计算逻辑。</p>
