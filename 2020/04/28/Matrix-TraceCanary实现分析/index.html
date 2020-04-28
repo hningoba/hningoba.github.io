@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文主要介绍Matrix的Trace部分，主要涉及帧率、ANR、慢函数、启动耗时的检测逻辑。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Matrix-TraceCanary实现分析">
+<meta property="og:url" content="https://hningoba.github.io/2020/04/28/Matrix-TraceCanary实现分析/index.html">
+<meta property="og:site_name" content="自律使人自由">
+<meta property="og:description" content="本文主要介绍Matrix的Trace部分，主要涉及帧率、ANR、慢函数、启动耗时的检测逻辑。">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_anr_log.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_evil_mthod_log.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_StartupTracer_field_annotation.png">
+<meta property="og:image" content="https://hningoba.github.io/2020/04/28/Matrix-TraceCanary实现分析/matrix_ActivityThreadHacker_method_trace.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_TestTraceMainActivity_dex.png">
+<meta property="og:updated_time" content="2020-04-28T10:47:51.709Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Matrix-TraceCanary实现分析">
+<meta name="twitter:description" content="本文主要介绍Matrix的Trace部分，主要涉及帧率、ANR、慢函数、启动耗时的检测逻辑。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_anr_log.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://hningoba.github.io/2020/04/28/Matrix-TraceCanary实现分析/"/>
+
+
+
+
+
+  <title>Matrix-TraceCanary实现分析 | 自律使人自由</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">自律使人自由</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2020/04/28/Matrix-TraceCanary实现分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hningoba">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律使人自由">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Matrix-TraceCanary实现分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-04-28T18:47:51+08:00">
+                2020-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文主要介绍Matrix的Trace部分，主要涉及帧率、ANR、慢函数、启动耗时的检测逻辑。</p>
+<a id="more"></a>
+<h3 id="Trace-Canary主要特性"><a href="#Trace-Canary主要特性" class="headerlink" title="Trace Canary主要特性"></a>Trace Canary主要特性</h3><p>回顾下Trace Canary主要特性：</p>
+<ul>
+<li>编译期动态修改字节码, 高性能记录执行耗时与调用堆栈</li>
+<li>准确的定位到发生卡顿的函数，提供执行堆栈、执行耗时、执行次数等信息，帮助快速解决卡顿问题</li>
+<li>自动涵盖卡顿、启动耗时、页面切换、慢函数检测等多个流畅性指标</li>
+</ul>
+<p>看下Tracer模块的类继承关系：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- Tracer</span><br><span class="line">	- FrameTracer</span><br><span class="line">	- AnrTracer</span><br><span class="line">	- EvilMethodTracer</span><br><span class="line">	- StratupTracer</span><br></pre></td></tr></table></figure>
+<p>通过类名就能看出来每个类的大体功能，下面逐个介绍。</p>
+<h3 id="帧率检测"><a href="#帧率检测" class="headerlink" title="帧率检测"></a>帧率检测</h3><p>FrameTracer部分主要做帧率、掉帧、帧耗时等检测，具体实现逻辑在FrameTracer和UIThreadMonitor。</p>
+<p>Demo中是在TestFpsActivity做的演示，onCreate()中通过FrameTracer.onStartTrace()开启检测，页面退出时通过FrameTracer.onCloseTrace()结束检测，并移除监控回调。</p>
+<p>我们按照调用栈倒序的逻辑，从使用侧开始，看看具体帧率计算逻辑。</p>
+<h5 id="TestFpsActivity："><a href="#TestFpsActivity：" class="headerlink" title="TestFpsActivity："></a>TestFpsActivity：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sample.tencent.matrix.trace.TestFpsActivity</span><br><span class="line"></span><br><span class="line">protected void onCreate(@Nullable Bundle savedInstanceState) &#123;</span><br><span class="line">	// 启动帧率检测，使用FrameTrace计算FPS</span><br><span class="line">	Matrix.with().getPluginByClass(TracePlugin.class).getFrameTracer().onStartTrace();			</span><br><span class="line">// 帧率回调	Matrix.with().getPluginByClass(TracePlugin.class).getFrameTracer().addListener(mDoFrameListener);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">protected void onDestroy() &#123;</span><br><span class="line">	super.onDestroy();</span><br><span class="line">// 移除帧率回调	Matrix.with().getPluginByClass(TracePlugin.class).getFrameTracer().removeListener(mDoFrameListener);</span><br><span class="line">// 关闭帧率检测</span><br><span class="line">	Matrix.with().getPluginByClass(TracePlugin.class).getFrameTracer().onCloseTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看下TestFpsActivity的FPS监控回调，代码如下。另外提一下，FrameTracer支持将回调方法IDoFrameListener.doFrameAsync()放到异步线程，前提是外部需要传入一个Executor。</p>
+<h5 id="IDoFrameListener-doFrameAsync-："><a href="#IDoFrameListener-doFrameAsync-：" class="headerlink" title="IDoFrameListener.doFrameAsync()："></a>IDoFrameListener.doFrameAsync()：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">sample.tencent.matrix.trace.TestFpsActivity</span><br><span class="line"></span><br><span class="line">// 异步线程</span><br><span class="line">private static HandlerThread sHandlerThread = new HandlerThread(&quot;test&quot;);</span><br><span class="line"></span><br><span class="line">// 帧率检测回调</span><br><span class="line">private IDoFrameListener mDoFrameListener = new IDoFrameListener(new Executor() &#123;</span><br><span class="line">        Handler handler = new Handler(sHandlerThread.getLooper());</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void execute(Runnable command) &#123;</span><br><span class="line">        	//将回调放到异步线程执行</span><br><span class="line">            handler.post(command);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;) &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void doFrameAsync(String visibleScene, long taskCost, long frameCostMs, int droppedFrames, boolean isContainsFrame) &#123;</span><br><span class="line">            super.doFrameAsync(visibleScene, taskCost, frameCostMs, droppedFrames, isContainsFrame);</span><br><span class="line">            // 计算总的掉帧数</span><br><span class="line">            count += droppedFrames;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
+<p>解释下IDoFrameListener.doFrameAsync()的参数含义：</p>
+<ul>
+<li>visibleScene：场景名称，默认是Activity的类名。这块代码是在Matrix初始化时，通过AppActiveMatrixDelegate.controller监听Activity生命周期，即registerActivityLifecycleCallbacks()。当Activity start时，将activity.getClass().getName()做为visibleScene。FrameTracer再通过AppMethodBeat.getVisibleScene()获取visibleScene。</li>
+<li>taskCost：主线程每一帧耗时</li>
+<li>frameCostMs：帧率检测时用不到</li>
+<li>droppedFrames：掉帧数</li>
+<li>isContainsFrame：是否包含一帧</li>
+</ul>
+<h5 id="FrameTracer-notifyListener-："><a href="#FrameTracer-notifyListener-：" class="headerlink" title="FrameTracer.notifyListener()："></a>FrameTracer.notifyListener()：</h5><p>上面doFrameAsync()是在FrameTracer.notifyListener()中执行的，代码在下面。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.tracer.FrameTracer</span><br><span class="line"></span><br><span class="line">    private void notifyListener(final String visibleScene, final long taskCostMs, final long frameCostMs, final boolean isContainsFrame) &#123;</span><br><span class="line">        long start = System.currentTimeMillis();</span><br><span class="line">        try &#123;</span><br><span class="line">            synchronized (listeners) &#123;</span><br><span class="line">                for (final IDoFrameListener listener : listeners) &#123;</span><br><span class="line">                    if (config.isDevEnv()) &#123;</span><br><span class="line">                        listener.time = SystemClock.uptimeMillis();</span><br><span class="line">                    &#125;</span><br><span class="line">                    // 计算掉帧数</span><br><span class="line">                    final int dropFrame = (int) (taskCostMs / frameIntervalMs);</span><br><span class="line"></span><br><span class="line">                    listener.doFrameSync(visibleScene, taskCostMs, frameCostMs, dropFrame, isContainsFrame);</span><br><span class="line">                    if (null != listener.getExecutor()) &#123;</span><br><span class="line">                    	//通过TestFpsActivity传入的Executor，将回调放到异步</span><br><span class="line">                        listener.getExecutor().execute(new Runnable() &#123;</span><br><span class="line">                            @Override</span><br><span class="line">                            public void run() &#123;</span><br><span class="line">                            	// 回调给TestFpsActivity</span><br><span class="line">                                listener.doFrameAsync(visibleScene, taskCostMs, frameCostMs, dropFrame, isContainsFrame);</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            long cost = System.currentTimeMillis() - start;</span><br><span class="line">            // debug模式下，回调doFrameAsync中执行超过17ms，log警告</span><br><span class="line">            if (config.isDebug() &amp;&amp; cost &gt; frameIntervalMs) &#123;</span><br><span class="line">                MatrixLog.w(TAG, &quot;[notifyListener] warm! maybe do heavy work in doFrameSync! size:%s cost:%sms&quot;, listeners.size(), cost);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出dropFrame就是taskCostMs/frameIntervalMs。其中，frameIntervalMs默认是17ms，计算逻辑是Choreographer.mFrameIntervalNanos（屏幕刷新时间间隔，默认16ms）+1，计算代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.tracer.FrameTracer</span><br><span class="line"></span><br><span class="line">this.frameIntervalMs = TimeUnit.MILLISECONDS.convert(UIThreadMonitor.getMonitor().getFrameIntervalNanos(), TimeUnit.NANOSECONDS) + 1;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.core.UIThreadMonitor</span><br><span class="line"></span><br><span class="line">choreographer = Choreographer.getInstance();</span><br><span class="line">// 通过反射获取Choreographer的mFrameIntervalNanos字段，默认是16ms</span><br><span class="line">frameIntervalNanos = reflectObject(choreographer, &quot;mFrameIntervalNanos&quot;);</span><br></pre></td></tr></table></figure>
+<h5 id="FrameTracer-doFrame"><a href="#FrameTracer-doFrame" class="headerlink" title="FrameTracer.doFrame():"></a>FrameTracer.doFrame():</h5><p>FrameTracer.notifyListener()调用过程是UIThreadMonitor.dispatchEnd() -&gt; FrameTracer.doFrame() -&gt; FrameTracer.notifyListener()。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.tracer.FrameTracer</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">    public void doFrame(String focusedActivityName, long start, long end, long frameCostMs, long inputCostNs, long animationCostNs, long traversalCostNs) &#123;</span><br><span class="line">        if (isForeground()) &#123;</span><br><span class="line">        	// IDoFrameListener.doFrameAsync()中的参数taskCostMs即为end - start。</span><br><span class="line">            notifyListener(focusedActivityName, end - start, frameCostMs, frameCostMs &gt;= 0);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h5 id="UIThreadMonitor-dispatchEnd"><a href="#UIThreadMonitor-dispatchEnd" class="headerlink" title="UIThreadMonitor.dispatchEnd()"></a>UIThreadMonitor.dispatchEnd()</h5><p>看下UIThreadMonitor.dispatchEnd()：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.core.UIThreadMonitor</span><br><span class="line"></span><br><span class="line">    private void dispatchEnd() &#123;</span><br><span class="line"></span><br><span class="line">        if (isBelongFrame) &#123;</span><br><span class="line">            doFrameEnd(token);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 每一帧的开始时间，在dispatchBegin()中赋值</span><br><span class="line">        long start = token;</span><br><span class="line">        // 当前时间，即每一帧的结束时间</span><br><span class="line">        long end = SystemClock.uptimeMillis();</span><br><span class="line"></span><br><span class="line">        synchronized (observers) &#123;</span><br><span class="line">            for (LooperObserver observer : observers) &#123;</span><br><span class="line">                if (observer.isDispatchBegin()) &#123;</span><br><span class="line">                	// AppMethodBeat.getVisibleScene()获取visibleScene</span><br><span class="line">                	// isBelongFrame ? end - start : 0 - frameCost, 如果是帧耗时计算，则frameCost为0，否则和taskCost一样</span><br><span class="line">                	// queueCost数组，存储对应Choreographer中三类task(input/animation/traversal)的耗时</span><br><span class="line">                    observer.doFrame(AppMethodBeat.getVisibleScene(), token, SystemClock.uptimeMillis(), isBelongFrame ? end - start : 0, queueCost[CALLBACK_INPUT], queueCost[CALLBACK_ANIMATION], queueCost[CALLBACK_TRAVERSAL]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 计算结束时间</span><br><span class="line">        dispatchTimeMs[3] = SystemClock.currentThreadTimeMillis();</span><br><span class="line">        dispatchTimeMs[1] = SystemClock.uptimeMillis();</span><br><span class="line"></span><br><span class="line">        AppMethodBeat.o(AppMethodBeat.METHOD_ID_DISPATCH);</span><br><span class="line"></span><br><span class="line">        synchronized (observers) &#123;</span><br><span class="line">            for (LooperObserver observer : observers) &#123;</span><br><span class="line">                if (observer.isDispatchBegin()) &#123;</span><br><span class="line">                    observer.dispatchEnd(dispatchTimeMs[0], dispatchTimeMs[2], dispatchTimeMs[1], dispatchTimeMs[3], token, isBelongFrame);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>解释下LooperObserver.dispatchEnd()方法中的几个参数的含义，后面都会用到。解释dispatchEnd()之前，看下UIThreadMonitor.dispatchBegin()的逻辑：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.core.UIThreadMonitor</span><br><span class="line"></span><br><span class="line">private void dispatchBegin() &#123;</span><br><span class="line">        token = dispatchTimeMs[0] = SystemClock.uptimeMillis();</span><br><span class="line">        dispatchTimeMs[2] = SystemClock.currentThreadTimeMillis();</span><br><span class="line">        AppMethodBeat.i(AppMethodBeat.METHOD_ID_DISPATCH);</span><br><span class="line"></span><br><span class="line">        synchronized (observers) &#123;</span><br><span class="line">            for (LooperObserver observer : observers) &#123;</span><br><span class="line">                if (!observer.isDispatchBegin()) &#123;</span><br><span class="line">                    observer.dispatchBegin(dispatchTimeMs[0], dispatchTimeMs[2], token);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>主要是对token、dispatchTimeMs[0]、dispatchTimeMs[2]赋值。其中，前两个是uptimeMillis，dispatchTimeMs[2]赋值当前线程的活动（线程处于running状态）时间点。</p>
+<p>看下LooperObserver.dispatchEnd()：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.listeners.LooperObserver</span><br><span class="line"></span><br><span class="line">public void dispatchEnd(long beginMs, long cpuBeginMs, long endMs, long cpuEndMs, long token, boolean isBelongFrame)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>beginMs：主线程一帧方法开始执行时间点，即dispatchTimeMs[0]，在UIThreadMonitor.dispatchBegin()中赋值</li>
+<li>cpuBeginMs：当前线程活动期间，方法开始执行时间点</li>
+<li>endMs：主线程一帧方法结束执行时间点，即dispatchTimeMs[2]，在UIThreadMonitor.dispatchEnd()中赋值。所以，一帧耗时就是endMs-beginMs。</li>
+<li>cpuEndMs：当前线程活动期间，方法解释执行时间点</li>
+<li>token：等同于beginMs</li>
+<li>isBelongFrame：可简单理解为是否属于主线程任务。在Choreographer处理input任务时执行UIThreadMonitor.run()，内部将isBelongFrame置为true，这块逻辑可以看下UIThreadMonitor.onStart()</li>
+</ul>
+<p>那么UIThreadMonitor.dispatchEnd()是谁执行的呢？从下面代码可以看出，UIThreadMonitor向LooperMonitor注册了监听器，用于监听每一帧的开始和结束。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.core.UIThreadMonitor</span><br><span class="line"></span><br><span class="line">LooperMonitor.register(new LooperMonitor.LooperDispatchListener() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public boolean isValid() &#123;</span><br><span class="line">                return isAlive;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void dispatchStart() &#123;</span><br><span class="line">                super.dispatchStart();</span><br><span class="line">                UIThreadMonitor.this.dispatchBegin();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void dispatchEnd() &#123;</span><br><span class="line">                super.dispatchEnd();</span><br><span class="line">                UIThreadMonitor.this.dispatchEnd();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;);</span><br></pre></td></tr></table></figure>
+<p>其中，LooperDispatchListener的dispatchStart()和dispatchEnd()都是LooperMonitor.dispatch()执行的。由isBegin决定执行dispatchStart()还是dispatchEnd()。</p>
+<h5 id="LooperMonitor-dispatch"><a href="#LooperMonitor-dispatch" class="headerlink" title="LooperMonitor.dispatch():"></a>LooperMonitor.dispatch():</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.core.LooperMonitor</span><br><span class="line"></span><br><span class="line">private void dispatch(boolean isBegin, String log) &#123;</span><br><span class="line">        for (LooperDispatchListener listener : listeners) &#123;</span><br><span class="line">            if (listener.isValid()) &#123;</span><br><span class="line">                if (isBegin) &#123;</span><br><span class="line">                    if (!listener.isHasDispatchStart) &#123;</span><br><span class="line">                        listener.onDispatchStart(log);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    if (listener.isHasDispatchStart) &#123;</span><br><span class="line">                        listener.onDispatchEnd(log);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; else if (!isBegin &amp;&amp; listener.isHasDispatchStart) &#123;</span><br><span class="line">                listener.dispatchEnd();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>isBegin的逻辑看下下面代码，主要是根据参数x内容，判断是开始还是结束，即isBegin。</p>
+<h5 id="LooperMonitor-LooperPrinter"><a href="#LooperMonitor-LooperPrinter" class="headerlink" title="LooperMonitor.LooperPrinter:"></a>LooperMonitor.LooperPrinter:</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.core.LooperMonitor</span><br><span class="line"></span><br><span class="line">class LooperPrinter implements Printer &#123;</span><br><span class="line">       </span><br><span class="line">        @Override</span><br><span class="line">        public void println(String x) &#123;</span><br><span class="line">            ...</span><br><span class="line"></span><br><span class="line">            if (!isHasChecked) &#123;</span><br><span class="line">            	// 根据参数x内容，判断是开始还是结束，即isBegin</span><br><span class="line">                isValid = x.charAt(0) == &apos;&gt;&apos; || x.charAt(0) == &apos;&lt;&apos;;</span><br><span class="line">                isHasChecked = true;</span><br><span class="line">                if (!isValid) &#123;</span><br><span class="line">                    MatrixLog.e(TAG, &quot;[println] Printer is inValid! x:%s&quot;, x);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (isValid) &#123;</span><br><span class="line">                dispatch(x.charAt(0) == &apos;&gt;&apos;, x);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在LooperMonitor初始化时，会向main looper注册一个LooperPrinter。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">looper = Looper.getMainLooper()</span><br><span class="line"></span><br><span class="line">looper.setMessageLogging(printer = new LooperPrinter(originPrinter));</span><br></pre></td></tr></table></figure>
+<h5 id="Looper-loop"><a href="#Looper-loop" class="headerlink" title="Looper.loop():"></a>Looper.loop():</h5><p>看到这里有些同学应该眼前一亮，很多APM计算帧率都采用了这个逻辑，我在<a href="https://hningoba.github.io/2019/11/28/Android Choreographer原理/">Android图形渲染之Choreographer原理</a> 最后也提到使用“Looper &amp; Printer”计算帧率，再看下Looper中的代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">android.os.Looper.java</span><br><span class="line"></span><br><span class="line">public static void loop() &#123;</span><br><span class="line">        final Looper me = myLooper();</span><br><span class="line">        if (me == null) &#123;</span><br><span class="line">            throw new RuntimeException(&quot;No Looper; Looper.prepare() wasn&apos;t called on this thread.&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        final MessageQueue queue = me.mQueue;</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">        for (;;) &#123;</span><br><span class="line">            Message msg = queue.next(); // might block</span><br><span class="line">            if (msg == null) &#123;</span><br><span class="line">                // No message indicates that the message queue is quitting.</span><br><span class="line">                return;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            // This must be in a local variable, in case a UI event sets the logger</span><br><span class="line">            // logging对象外部自定义，传入一个自定义Printer实现每一帧的监听计算</span><br><span class="line">            final Printer logging = me.mLogging;</span><br><span class="line">            if (logging != null) &#123;</span><br><span class="line">            		// 每一帧开始时打印的log</span><br><span class="line">                logging.println(&quot;&gt;&gt;&gt;&gt;&gt; Dispatching to &quot; + msg.target + &quot; &quot; +</span><br><span class="line">                        msg.callback + &quot;: &quot; + msg.what);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            ...</span><br><span class="line">            </span><br><span class="line">            try &#123;</span><br><span class="line">            		// 消息执行</span><br><span class="line">                msg.target.dispatchMessage(msg);</span><br><span class="line">                dispatchEnd = needEndTime ? SystemClock.uptimeMillis() : 0;</span><br><span class="line">            &#125; finally &#123;</span><br><span class="line">                if (traceTag != 0) &#123;</span><br><span class="line">                    Trace.traceEnd(traceTag);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            ...</span><br><span class="line"></span><br><span class="line">            if (logging != null) &#123;</span><br><span class="line">            		// 每一帧结束时打印的log</span><br><span class="line">                logging.println(&quot;&lt;&lt;&lt;&lt;&lt; Finished to &quot; + msg.target + &quot; &quot; + msg.callback);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>主线程（main looper）每一帧执行(dispatchMessage())开始和结束时，Looper通过一个Printer对象分别打印”&gt;&gt;&gt;&gt;&gt; Dispatching to…”和”&lt;&lt;&lt;&lt;&lt; Finished to”。通过Looper.setMessageLogging()设置我们自定义的Printer，通过监听主线程方法执行前后的两个日志字符串，就可以计算一帧的耗时。</p>
+<h5 id="整体代码执行过程："><a href="#整体代码执行过程：" class="headerlink" title="整体代码执行过程："></a>整体代码执行过程：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- LooperMonitor.LooperPrinter.println()</span><br><span class="line">- LooperMonitor.dispatch()</span><br><span class="line">- UIThreadMonitor.dispatchBegin()/dispatchEnd()</span><br><span class="line">- FrameTracer.doFrame()</span><br><span class="line">- FrameTracer.notifyListener()</span><br><span class="line">- TestFpsActivity.IDoFrameListener.doFrameSync()/doFrameAsync()</span><br></pre></td></tr></table></figure>
+<h5 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h5><ul>
+<li>帧率检测使用“Looper &amp; Printer”方式，Printer的日志字符串对应主线程每一帧方法执行的开始和结束，进而计算每一帧耗时。</li>
+</ul>
+<h3 id="ANR检测"><a href="#ANR检测" class="headerlink" title="ANR检测"></a>ANR检测</h3><p>ANR检测主要代码在AnrTracer。在demo中，TestTraceMainActivity.testANR()内部执行耗时改大一点（大于5000ms），比如改到7800，就能看到AS中输出如下ANR警告log：</p>
+<p><img src="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_anr_log.png" width="80%"></p>
+<p>看下AnrTracer如何统计ANR，收集上述log信息的。主要代码在AnrTracer：</p>
+<h5 id="AnrTracer："><a href="#AnrTracer：" class="headerlink" title="AnrTracer："></a>AnrTracer：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.tracer.AnrTracer</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">    public void dispatchBegin(long beginMs, long cpuBeginMs, long token) &#123;</span><br><span class="line">        super.dispatchBegin(beginMs, cpuBeginMs, token);</span><br><span class="line">        // 构造AnrTask</span><br><span class="line">        anrTask = new AnrHandleTask(AppMethodBeat.getInstance().maskIndex(&quot;AnrTracer#dispatchBegin&quot;), token);</span><br><span class="line">        </span><br><span class="line">        // 延迟5s发消息，Constants.DEFAULT_ANR = 5 * 1000</span><br><span class="line">        // token是方法开始执行的时间</span><br><span class="line">        // (SystemClock.uptimeMillis() - token)：校正方法的开始时间</span><br><span class="line">        anrHandler.postDelayed(anrTask, Constants.DEFAULT_ANR - (SystemClock.uptimeMillis() - token));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void dispatchEnd(long beginMs, long cpuBeginMs, long endMs, long cpuEndMs, long token, boolean isBelongFrame) &#123;</span><br><span class="line">        super.dispatchEnd(beginMs, cpuBeginMs, endMs, cpuEndMs, token, isBelongFrame);</span><br><span class="line">        // 移除anrTask</span><br><span class="line">        if (null != anrTask) &#123;</span><br><span class="line">            anrTask.getBeginRecord().release();</span><br><span class="line">            anrHandler.removeCallbacks(anrTask);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>前面讲FrameTracer时提到过，每一帧执行前后分别回调Tracer.dispatchBegin()和Tracer.dispatchEnd()。</p>
+<p>在dispatchBegin()中发送了一个延迟消息执行AnrTask，延迟时间约为5s（Constants.DEFAULT_ANR = 5 * 1000），在dispatchEnd()移除对应的任务。所以，如果主线程一帧执行任务超过5s，AnrTask就会执行。</p>
+<h5 id="AnrTask："><a href="#AnrTask：" class="headerlink" title="AnrTask："></a>AnrTask：</h5><p>看下AnrTask的逻辑：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.tracer.AnrTracer.AnrHandleTask</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">public void run() &#123;</span><br><span class="line">    long curTime = SystemClock.uptimeMillis();</span><br><span class="line">    boolean isForeground = isForeground();</span><br><span class="line">    </span><br><span class="line">    // process 进程信息</span><br><span class="line">    int[] processStat = Utils.getProcessPriority(Process.myPid());</span><br><span class="line">    long[] data = AppMethodBeat.getInstance().copyData(beginRecord);</span><br><span class="line">    beginRecord.release();</span><br><span class="line">    // 业务场景，FrameTracer中提到过</span><br><span class="line">    String scene = AppMethodBeat.getVisibleScene();</span><br><span class="line"></span><br><span class="line">    // memory 内存信息，其中VmSize从“/proc/&#123;PID&#125;/status”文件中获取</span><br><span class="line">    long[] memoryInfo = dumpMemory();</span><br><span class="line"></span><br><span class="line">    // Thread state</span><br><span class="line">    Thread.State status = Looper.getMainLooper().getThread().getState();</span><br><span class="line">    </span><br><span class="line">    // 获取线程调用堆栈</span><br><span class="line">    StackTraceElement[] stackTrace = Looper.getMainLooper().getThread().getStackTrace();</span><br><span class="line">    // 限制堆栈长度</span><br><span class="line">    String dumpStack = Utils.getStack(stackTrace, &quot;|*\t\t&quot;, 12);</span><br><span class="line"></span><br><span class="line">    // frame</span><br><span class="line">    UIThreadMonitor monitor = UIThreadMonitor.getMonitor();</span><br><span class="line">    // 获取input/animation/traversal三类任务耗时</span><br><span class="line">    long inputCost = monitor.getQueueCost(UIThreadMonitor.CALLBACK_INPUT, token);</span><br><span class="line">    long animationCost = monitor.getQueueCost(UIThreadMonitor.CALLBACK_ANIMATION, token);</span><br><span class="line">    long traversalCost = monitor.getQueueCost(UIThreadMonitor.CALLBACK_TRAVERSAL, token);</span><br><span class="line"></span><br><span class="line">    // trace</span><br><span class="line">    LinkedList&lt;MethodItem&gt; stack = new LinkedList();</span><br><span class="line">    if (data.length &gt; 0) &#123;</span><br><span class="line">        TraceDataUtils.structuredDataToStack(data, stack, true, curTime);</span><br><span class="line">        TraceDataUtils.trimStack(stack, Constants.TARGET_EVIL_METHOD_STACK, new TraceDataUtils.IStructuredDataFilter() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public boolean isFilter(long during, int filterCount) &#123;</span><br><span class="line">                return during &lt; filterCount * Constants.TIME_UPDATE_CYCLE_MS;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public int getFilterMaxCount() &#123;</span><br><span class="line">                return Constants.FILTER_STACK_MAX_COUNT;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void fallback(List&lt;MethodItem&gt; stack, int size) &#123;</span><br><span class="line">                MatrixLog.w(TAG, &quot;[fallback] size:%s targetSize:%s stack:%s&quot;, size, Constants.TARGET_EVIL_METHOD_STACK, stack);</span><br><span class="line">                Iterator iterator = stack.listIterator(Math.min(size, Constants.TARGET_EVIL_METHOD_STACK));</span><br><span class="line">                while (iterator.hasNext()) &#123;</span><br><span class="line">                    iterator.next();</span><br><span class="line">                    iterator.remove();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    StringBuilder reportBuilder = new StringBuilder();</span><br><span class="line">    StringBuilder logcatBuilder = new StringBuilder();</span><br><span class="line">    </span><br><span class="line">    // 获取ANR时长</span><br><span class="line">    long stackCost = Math.max(Constants.DEFAULT_ANR, TraceDataUtils.stackToString(stack, reportBuilder, logcatBuilder));</span><br><span class="line"></span><br><span class="line">    // stackKey</span><br><span class="line">    String stackKey = TraceDataUtils.getTreeKey(stack, stackCost);</span><br><span class="line">    </span><br><span class="line">    // 打印ANR日志</span><br><span class="line">    MatrixLog.w(TAG, &quot;%s \npostTime:%s curTime:%s&quot;,</span><br><span class="line">            printAnr(scene, processStat, memoryInfo, status, logcatBuilder, isForeground, stack.size(), stackKey, dumpStack, inputCost, animationCost, traversalCost, stackCost), token, curTime); // for logcat</span><br><span class="line"></span><br><span class="line">    if (stackCost &gt;= Constants.DEFAULT_ANR_INVALID) &#123;</span><br><span class="line">        MatrixLog.w(TAG, &quot;The checked anr task was not executed on time. &quot;</span><br><span class="line">                + &quot;The possible reason is that the current process has a low priority. just pass this report&quot;);</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // report 启动IssuesListActivity页面，展示ANR信息</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="总结：-1"><a href="#总结：-1" class="headerlink" title="总结："></a>总结：</h5><p>在异步线程执行AnrTask，计算进程、调用堆栈、内存使用、trace信息，后续将信息log出来，并启动IssuesListActivity展示ANR结果。</p>
+<h3 id="慢函数检测"><a href="#慢函数检测" class="headerlink" title="慢函数检测"></a>慢函数检测</h3><p>像ANR检测部分提到的，将TestTraceMainActivity.testANR()实现耗时改成7800，AS会输出如下慢函数log。从log中可以看出发生了Jankiness，方法耗时7804ms，和我们的修改基本吻合。</p>
+<p><img src="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_evil_mthod_log.png" width="80%"></p>
+<p>下面看下慢函数的实现逻辑，主要代码在EvilMethodTracer。</p>
+<h5 id="EvilMethodTracer："><a href="#EvilMethodTracer：" class="headerlink" title="EvilMethodTracer："></a>EvilMethodTracer：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.tracer.EvilMethodTracer</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">    public void dispatchEnd(long beginMs, long cpuBeginMs, long endMs, long cpuEndMs, long token, boolean isBelongFrame) &#123;</span><br><span class="line">        super.dispatchEnd(beginMs, cpuBeginMs, endMs, cpuEndMs, token, isBelongFrame);</span><br><span class="line">        long start = config.isDevEnv() ? System.currentTimeMillis() : 0;</span><br><span class="line">        try &#123;</span><br><span class="line">            long dispatchCost = endMs - beginMs;</span><br><span class="line">            // 一帧耗时超过evilThresholdMs（默认700ms），执行慢函数逻辑计算</span><br><span class="line">            if (dispatchCost &gt;= evilThresholdMs) &#123;</span><br><span class="line">                long[] data = AppMethodBeat.getInstance().copyData(indexRecord);</span><br><span class="line">                long[] queueCosts = new long[3];</span><br><span class="line">                System.arraycopy(queueTypeCosts, 0, queueCosts, 0, 3);</span><br><span class="line">                String scene = AppMethodBeat.getVisibleScene();</span><br><span class="line">                // 异步线程执行AnalyseTask</span><br><span class="line">                MatrixHandlerThread.getDefaultHandler().post(new AnalyseTask(isForeground(), scene, data, queueCosts, cpuEndMs - cpuBeginMs, endMs - beginMs, endMs));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>从上面代码可以看出，当主线程一帧内耗时超过evilThresholdMs（默认700ms，可以通过TraceConfig配置），执行慢函数的警告，打印上面提到的log。</p>
+<p>其中，慢函数的耗时，就是上面代码中的<code>endMs - beginMs</code>，这个逻辑在“帧率检测 - UIThreadMonitor.dispatchEnd()”中有具体讲到。</p>
+<p>具体慢函数打印的log逻辑如下：</p>
+<h5 id="AnalyseTask"><a href="#AnalyseTask" class="headerlink" title="AnalyseTask:"></a>AnalyseTask:</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.tracer.EvilMethodTracer.AnalyseTask</span><br><span class="line"></span><br><span class="line">private class AnalyseTask implements Runnable &#123;</span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">        void analyse() &#123;</span><br><span class="line"></span><br><span class="line">            // process</span><br><span class="line">            int[] processStat = Utils.getProcessPriority(Process.myPid());</span><br><span class="line">            String usage = Utils.calculateCpuUsage(cpuCost, cost);</span><br><span class="line">            LinkedList&lt;MethodItem&gt; stack = new LinkedList();</span><br><span class="line">            if (data.length &gt; 0) &#123;</span><br><span class="line">                TraceDataUtils.structuredDataToStack(data, stack, true, endMs);</span><br><span class="line">                TraceDataUtils.trimStack(stack, Constants.TARGET_EVIL_METHOD_STACK, new TraceDataUtils.IStructuredDataFilter() &#123;</span><br><span class="line">                    @Override</span><br><span class="line">                    public boolean isFilter(long during, int filterCount) &#123;</span><br><span class="line">                        return during &lt; filterCount * Constants.TIME_UPDATE_CYCLE_MS;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    @Override</span><br><span class="line">                    public int getFilterMaxCount() &#123;</span><br><span class="line">                        return Constants.FILTER_STACK_MAX_COUNT;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    @Override</span><br><span class="line">                    public void fallback(List&lt;MethodItem&gt; stack, int size) &#123;</span><br><span class="line">                        MatrixLog.w(TAG, &quot;[fallback] size:%s targetSize:%s stack:%s&quot;, size, Constants.TARGET_EVIL_METHOD_STACK, stack);</span><br><span class="line">                        Iterator iterator = stack.listIterator(Math.min(size, Constants.TARGET_EVIL_METHOD_STACK));</span><br><span class="line">                        while (iterator.hasNext()) &#123;</span><br><span class="line">                            iterator.next();</span><br><span class="line">                            iterator.remove();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            StringBuilder reportBuilder = new StringBuilder();</span><br><span class="line">            StringBuilder logcatBuilder = new StringBuilder();</span><br><span class="line">            long stackCost = Math.max(cost, TraceDataUtils.stackToString(stack, reportBuilder, logcatBuilder));</span><br><span class="line">            String stackKey = TraceDataUtils.getTreeKey(stack, stackCost);</span><br><span class="line"></span><br><span class="line">					// 和AnrTracer一样，打印log，启动IssuesListActivity页面，展示EvilMethod信息</span><br><span class="line">            MatrixLog.w(TAG, &quot;%s&quot;, printEvil(scene, processStat, isForeground, logcatBuilder, stack.size(), stackKey, usage, queueCost[0], queueCost[1], queueCost[2], cost)); // for logcat</span><br><span class="line"></span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h5 id="总结：-2"><a href="#总结：-2" class="headerlink" title="总结："></a>总结：</h5><p>AnalyseTask的逻辑和AnrTask类似，只是log中的部分内容不一样，就不具体展开了。</p>
+<h3 id="启动耗时检测"><a href="#启动耗时检测" class="headerlink" title="启动耗时检测"></a>启动耗时检测</h3><h5 id="三种启动方式："><a href="#三种启动方式：" class="headerlink" title="三种启动方式："></a>三种启动方式：</h5><p><a href="https://developer.android.com/topic/performance/vitals/launch-time" target="_blank" rel="noopener">官方</a>定义了三种启动方式：</p>
+<ul>
+<li>冷启动：彻底杀死应用进程后启动APP的方式。系统会为应用创建进程、主线程，会执行Application、launch Activity的初始化方法。</li>
+<li>热启动：没有杀死应用进程情况下启动APP的方式，比如应用切到后台。热启动中，系统的所有工作就是将您的 Activity 带到前台。这种情况不会执行Application的初始化方法，如果应用的所有 Activity 都还驻留在内存中，则应用可以无须重复对象初始化、布局扩充和呈现。</li>
+<li>温启动：<ul>
+<li>有两种常见场景：<ul>
+<li>点击回退键方式退出应用</li>
+<li>应用在后台被系统回收</li>
+</ul>
+</li>
+<li>启动逻辑介于冷启动和热启动之间。如果是回退键方式退出应用再重启，不会执行Application初始化，但是需要初始化Activity。如果是系统回收后的重启，Application和Activity都会初始化，但是可以通过savedInstanceState拿到退出前Activity的状态。</li>
+</ul>
+</li>
+</ul>
+<h5 id="冷启动分析"><a href="#冷启动分析" class="headerlink" title="冷启动分析"></a>冷启动分析</h5><p>我们这里只对冷启动做分析，冷启动Demo后，可以看到如下log：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Matrix.StartupTracer: [report] applicationCost:42 firstScreenCost:244 allCost:2306 isWarmStartUp:false</span><br></pre></td></tr></table></figure>
+<p>显示非热启动（即冷启动），Application耗时42ms，首屏耗时244ms，总耗时2306ms。通过log可以知道是StartupTracer做的上报。</p>
+<p>计算应用的启动耗时，就需要知道Application的启动开始、启动完成时间点，launch Activity的启动开始、启动完成时间点。通过下图StartupTracer的类注释，可以大概了解如下几个字段的含义和对应的耗时区间：</p>
+<p><img src="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_StartupTracer_field_annotation.png"></p>
+<p>简单解释下上图中几个关键统计点：</p>
+<ul>
+<li>Application初始化耗时(applicationCost)：<ul>
+<li>指Application的初始化耗时。</li>
+<li>起始点对应Application.onCreate()，由<code>ActivityThreadHacker.sApplicationCreateBeginTime</code>字段标记，该字段在ActivityThreadHacker.hackSysHandlerCallback()赋值。</li>
+<li>结束点对应handle launch activity message的时间点（通过hook ActivityThread的mH.mCallback实现拦截主线程message），由<code>ActivityThreadHacker.sApplicationCreateEndTime</code>字段标记，该字段在<code>ActivityThreadHacker.HackCallback.handleMessage()</code>中赋值。</li>
+</ul>
+</li>
+<li>首屏耗时(firstScreenCost)：<ul>
+<li>指app启动到第一个Activity(launch activity)初始化完成的耗时，粗略包含applicationCost + launchActivity初始化耗时。</li>
+<li>起始点和applicationCost的起始点一样，由<code>ActivityThreadHacker.sApplicationCreateBeginTime</code>字段标记。</li>
+<li>结束点对应开屏页的onWindowFocusChange()（但是代码跟踪显示是IssueListActivity.onWindowFocusChange()），在StartupTracer.onActivityFocused()中标记。</li>
+</ul>
+</li>
+<li>冷启动耗时(coldCost)<ul>
+<li>app启动到第一个对用户有意义的Activity（对应图中的careActivity）初始化完成耗时。应用一般将闪屏页即launch activity仅作为logo展示、应用初始化的工作，其后的第一个Activity做为主页Activity，这个Activity就是careActivity，所以把careActivity的初始化完成做为coldCost的结束点。</li>
+</ul>
+</li>
+<li>温启动耗时(warmCost)<ul>
+<li>因为Application不会重新初始化，只统计Activity的初始化耗时。</li>
+<li>起始点是launch Activity初始化的开始点。</li>
+<li>结束点是launch Activity onWindfocusChanged()执行点。</li>
+</ul>
+</li>
+</ul>
+<h5 id="StartupTracer："><a href="#StartupTracer：" class="headerlink" title="StartupTracer："></a>StartupTracer：</h5><p>前面讲到启动耗时统计逻辑在StartupTracer。看下StartupTracer.onActivityFocused()，该方法在Activity.onWindfocusChanged()内部执行，这部分通过插桩实现。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.tracer.StartupTracer</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void onActivityFocused(String activity) &#123;</span><br><span class="line">    	// coldCost == 0时认为是冷启动状态</span><br><span class="line">        if (isColdStartup()) &#123;</span><br><span class="line">            if (firstScreenCost == 0) &#123;</span><br><span class="line">            	// 第一个Activity.onWindfocusChanged()执行时统计首屏耗时</span><br><span class="line">                this.firstScreenCost = uptimeMillis() - ActivityThreadHacker.getEggBrokenTime();</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            //闪屏页已经初始化，其之后的第一个Activity.onWindfocusChanged()执行时，开始统计冷启动耗时</span><br><span class="line">            if (hasShowSplashActivity) &#123;</span><br><span class="line">                coldCost = uptimeMillis() - ActivityThreadHacker.getEggBrokenTime();</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">            	// 判断闪屏页是否启动，splashActivities在MatrixApplication.onCraete是配置的</span><br><span class="line">                if (splashActivities.contains(activity)) &#123;</span><br><span class="line">                    hasShowSplashActivity = true;</span><br><span class="line">                &#125; else if (splashActivities.isEmpty()) &#123;</span><br><span class="line">                    MatrixLog.i(TAG, &quot;default splash activity[%s]&quot;, activity);</span><br><span class="line">                    coldCost = firstScreenCost;</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    ...</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            // 冷启动后，执行AnalyseTask</span><br><span class="line">            if (coldCost &gt; 0) &#123;</span><br><span class="line">                analyse(ActivityThreadHacker.getApplicationCost(), firstScreenCost, coldCost, false);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125; else if (isWarmStartUp()) &#123;</span><br><span class="line">            // 温启动和冷启动逻辑类似，记录的开始、结束点前面概念部分已经讲到</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>再解释下上面部分代码：</p>
+<ul>
+<li>isColdStartup()：coldCost为0时即为冷启动。</li>
+<li>coldCost：闪屏页初始化后，其之后的第一个Activity(careActivity)的onWindfocusChanged()执行时，计算冷启动耗时。</li>
+<li>applicationCost应用耗时：即ActivityThreadHacker.getApplicationCost()，起始点、结束点计算逻辑后面再展开。</li>
+<li>ActivityThreadHacker.getEggBrokenTime()：Application初始化的开始点。</li>
+<li>splashActivities：保持闪屏页列表，在TraceConfig中初始化。demo中是在MatrixApplication.onCraete()手动配置splash Activity。</li>
+</ul>
+<p>有了上面这些耗时统计，AnalyseTask利用这些数据，进行堆栈优化、数据整理，打印出前面的启动耗时log。</p>
+<h5 id="Application初始化耗时："><a href="#Application初始化耗时：" class="headerlink" title="Application初始化耗时："></a>Application初始化耗时：</h5><p>前面讲到，Application初始化耗时的获取方式是<code>ActivityThreadHacker.getApplicationCost()</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.hacker.ActivityThreadHacker</span><br><span class="line"></span><br><span class="line">public static long getApplicationCost() &#123;</span><br><span class="line">        return ActivityThreadHacker.sApplicationCreateEndTime - ActivityThreadHacker.sApplicationCreateBeginTime;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>内部记录了Application初始的开始点sApplicationCreateBeginTime和结束点sApplicationCreateEndTime。那么这两个点在什么时机赋值的呢？</p>
+<p>通过跟踪代码，可以发现sApplicationCreateBeginTime是在<code>ActivityThreadHacker.hackSysHandlerCallback()</code>中赋值。在其内部打个断电，冷启动APP后，方法调用栈如下图：</p>
+<p><img src="matrix_ActivityThreadHacker_method_trace.png" alt="matrix_ActivityThreadHacker_method_trace"></p>
+<p>从上图代码调用流程中可以看到，MatrixApplication.onCreate()调用AppMethodBeat.i()（通过插桩实现），进而执行ActivityThreadHacker.hackSysHandlerCallback()，即sApplicationCreateBeginTime对应Application.onCreate()。</p>
+<p>sApplicationCreateEndTime在<code>ActivityThreadHacker.HackCallback.handleMessage()</code>中赋值。</p>
+<p>下面讲下<code>ActivityThreadHacker</code>相关逻辑。</p>
+<h5 id="ActivityThreadHacker："><a href="#ActivityThreadHacker：" class="headerlink" title="ActivityThreadHacker："></a>ActivityThreadHacker：</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.hacker.ActivityThreadHacker</span><br><span class="line"></span><br><span class="line">public static void hackSysHandlerCallback() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            sApplicationCreateBeginTime = SystemClock.uptimeMillis();</span><br><span class="line">            sApplicationCreateBeginMethodIndex = AppMethodBeat.getInstance().maskIndex(&quot;ApplicationCreateBeginMethodIndex&quot;);</span><br><span class="line">            Class&lt;?&gt; forName = Class.forName(&quot;android.app.ActivityThread&quot;);</span><br><span class="line">            Field field = forName.getDeclaredField(&quot;sCurrentActivityThread&quot;);</span><br><span class="line">            field.setAccessible(true);</span><br><span class="line">            // step1. 通过反射获取ActivityThread.sCurrentActivityThread对象</span><br><span class="line">            Object activityThreadValue = field.get(forName);</span><br><span class="line">            </span><br><span class="line">            Field mH = forName.getDeclaredField(&quot;mH&quot;);</span><br><span class="line">            mH.setAccessible(true);</span><br><span class="line">            // step2. 通过反射获取sCurrentActivityThread的mH对象</span><br><span class="line">            Object handler = mH.get(activityThreadValue);</span><br><span class="line">            </span><br><span class="line">            Class&lt;?&gt; handlerClass = handler.getClass().getSuperclass();</span><br><span class="line">            Field callbackField = handlerClass.getDeclaredField(&quot;mCallback&quot;);</span><br><span class="line">            callbackField.setAccessible(true);</span><br><span class="line">            Handler.Callback originalCallback = (Handler.Callback) callbackField.get(handler);</span><br><span class="line">            HackCallback callback = new HackCallback(originalCallback);</span><br><span class="line">            // step3. 将mH中的mCallback设置成HackCallback</span><br><span class="line">            callbackField.set(handler, callback);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            MatrixLog.e(TAG, &quot;hook system handler err! %s&quot;, e.getCause().toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>上面这部分代码，通过注释可以了解到，本质上是通过反射，将ActivityThreadHacker.HackCallback设置成主线程Handler的mCallback。这样，就可以拦截主线程消息做一些工作。对ActivityThread还不太了解的同学可以看看这篇文章：<a href="http://gityuan.com/2017/04/02/android-application/" target="_blank" rel="noopener">理解Application创建过程</a>。</p>
+<p>拦截了主线程消息做的事情看看下面代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.hacker.ActivityThreadHacker</span><br><span class="line"></span><br><span class="line">private final static class HackCallback implements Handler.Callback &#123;</span><br><span class="line">        private static final int LAUNCH_ACTIVITY = 100;</span><br><span class="line">        private static final int CREATE_SERVICE = 114;</span><br><span class="line">        private static final int RECEIVER = 113;</span><br><span class="line">        public static final int EXECUTE_TRANSACTION = 159; // for Android 9.0</span><br><span class="line">        private static boolean isCreated = false;</span><br><span class="line">        private static int hasPrint = 10;</span><br><span class="line"></span><br><span class="line">        private final Handler.Callback mOriginalCallback;</span><br><span class="line"></span><br><span class="line">        HackCallback(Handler.Callback callback) &#123;</span><br><span class="line">            this.mOriginalCallback = callback;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public boolean handleMessage(Message msg) &#123;</span><br><span class="line"></span><br><span class="line">            if (!AppMethodBeat.isRealTrace()) &#123;</span><br><span class="line">                return null != mOriginalCallback &amp;&amp; mOriginalCallback.handleMessage(msg);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            boolean isLaunchActivity = isLaunchActivity(msg);</span><br><span class="line">            if (hasPrint &gt; 0) &#123;</span><br><span class="line">                MatrixLog.i(TAG, &quot;[handleMessage] msg.what:%s begin:%s isLaunchActivity:%s&quot;, msg.what, SystemClock.uptimeMillis(), isLaunchActivity);</span><br><span class="line">                hasPrint--;</span><br><span class="line">            &#125;</span><br><span class="line">            if (isLaunchActivity) &#123;</span><br><span class="line">                ActivityThreadHacker.sLastLaunchActivityTime = SystemClock.uptimeMillis();</span><br><span class="line">                ActivityThreadHacker.sLastLaunchActivityMethodIndex = AppMethodBeat.getInstance().maskIndex(&quot;LastLaunchActivityMethodIndex&quot;);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (!isCreated) &#123;</span><br><span class="line">                if (isLaunchActivity || msg.what == CREATE_SERVICE || msg.what == RECEIVER) &#123; // todo for provider</span><br><span class="line">                    ActivityThreadHacker.sApplicationCreateEndTime = SystemClock.uptimeMillis();</span><br><span class="line">                    ActivityThreadHacker.sApplicationCreateScene = msg.what;</span><br><span class="line">                    isCreated = true;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            return null != mOriginalCallback &amp;&amp; mOriginalCallback.handleMessage(msg);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="Launch-Activity初始化耗时检测："><a href="#Launch-Activity初始化耗时检测：" class="headerlink" title="Launch Activity初始化耗时检测："></a>Launch Activity初始化耗时检测：</h5><p>ActivityThreadHacker中有个方法是获取launch activity的启动时间点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static long getLastLaunchActivityTime() &#123;</span><br><span class="line">        return ActivityThreadHacker.sLastLaunchActivityTime;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>那么，这个时间点是怎么获取的呢？如何判断一个Activity是launch Activity？看下面代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.hacker.ActivityThreadHacker</span><br><span class="line"></span><br><span class="line">private boolean isLaunchActivity(Message msg) &#123;</span><br><span class="line">    if (Build.VERSION.SDK_INT &gt; Build.VERSION_CODES.O_MR1) &#123;</span><br><span class="line">        if (msg.what == EXECUTE_TRANSACTION &amp;&amp; msg.obj != null) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                if (null == method) &#123;</span><br><span class="line">                    Class clazz = Class.forName(&quot;android.app.servertransaction.ClientTransaction&quot;);</span><br><span class="line">                    method = clazz.getDeclaredMethod(&quot;getCallbacks&quot;);</span><br><span class="line">                    method.setAccessible(true);</span><br><span class="line">                &#125;</span><br><span class="line">                List list = (List) method.invoke(msg.obj);</span><br><span class="line">                if (!list.isEmpty()) &#123;</span><br><span class="line">                    return list.get(0).getClass().getName().endsWith(&quot;.LaunchActivityItem&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; catch (Exception e) &#123;</span><br><span class="line">                MatrixLog.e(TAG, &quot;[isLaunchActivity] %s&quot;, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return msg.what == LAUNCH_ACTIVITY;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        return msg.what == LAUNCH_ACTIVITY;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="总结：-3"><a href="#总结：-3" class="headerlink" title="总结："></a>总结：</h5><ul>
+<li>Application初始化开始、结束节点：</li>
+<li>Launch Activity初始化开始、结束节点：</li>
+</ul>
+<p>插桩结果：</p>
+<p><img src="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_TestTraceMainActivity_dex.png"></p>
+<p>插桩代码：</p>
+<p>matrix-gradle-plugin : MethodTracer.insertWindowFocusChangeMethod()</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">private void insertWindowFocusChangeMethod(ClassVisitor cv, String classname) &#123;</span><br><span class="line">       MethodVisitor methodVisitor = cv.visitMethod(Opcodes.ACC_PUBLIC, TraceBuildConstants.MATRIX_TRACE_ON_WINDOW_FOCUS_METHOD,</span><br><span class="line">               TraceBuildConstants.MATRIX_TRACE_ON_WINDOW_FOCUS_METHOD_ARGS, null, null);</span><br><span class="line">       methodVisitor.visitCode();</span><br><span class="line">       methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);</span><br><span class="line">       methodVisitor.visitVarInsn(Opcodes.ILOAD, 1);</span><br><span class="line">       methodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL, TraceBuildConstants.MATRIX_TRACE_ACTIVITY_CLASS, TraceBuildConstants.MATRIX_TRACE_ON_WINDOW_FOCUS_METHOD,</span><br><span class="line">               TraceBuildConstants.MATRIX_TRACE_ON_WINDOW_FOCUS_METHOD_ARGS, false);</span><br><span class="line">       traceWindowFocusChangeMethod(methodVisitor, classname);</span><br><span class="line">       methodVisitor.visitInsn(Opcodes.RETURN);</span><br><span class="line">       methodVisitor.visitMaxs(2, 2);</span><br><span class="line">       methodVisitor.visitEnd();</span><br><span class="line"></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Trace插桩"><a href="#Trace插桩" class="headerlink" title="Trace插桩"></a>Trace插桩</h3><p>在讲应用启动耗时，提到了几个插桩点，主要实现在MethodTracer，看下这部分代码。对ASM和gradle Transform不了解的同学可以先看看我写的这两篇文章了解下基本用法：<a href="https://github.com/hningoba/KnowledgeSummary/blob/master/Android随便看看/自定义Gradle插件介绍.md" target="_blank" rel="noopener">自定义Gradle插件介绍</a>、<a href="https://github.com/hningoba/KnowledgeSummary/blob/master/Android随便看看/ASM用法介绍.md" target="_blank" rel="noopener">ASM用法介绍</a>。</p>
+<p>前面讲启动耗时检测统计Application耗时时提到，demo中MatrixApplication执行AppMethodBeat.i()，进而执行<code>ActivityThreadHacker.hackSysHandlerCallback()</code>，在这里记录sApplicationCreateBeginTime。</p>
+<p>跟踪代码就会发现，MatrixApplication.onCreate()中找不到AppMethodBeat.i()的调用。这个逻辑其实是通过ASM进行插桩实现的。具体代码执行逻辑在matrix-gradle-plugin的MethodTracer：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">com.tencent.matrix.trace.MethodTracer.TraceClassAdapter</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">        protected void onMethodEnter() &#123;</span><br><span class="line">            TraceMethod traceMethod = collectedMethodMap.get(methodName);</span><br><span class="line">            if (traceMethod != null) &#123;</span><br><span class="line">                traceMethodCount.incrementAndGet();</span><br><span class="line">                mv.visitLdcInsn(traceMethod.id);</span><br><span class="line">                // 插入静态方法AppMethodBeat.i()</span><br><span class="line">                mv.visitMethodInsn(INVOKESTATIC, TraceBuildConstants.MATRIX_TRACE_CLASS, &quot;i&quot;, &quot;(I)V&quot;, false);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>其中，TraceBuildConstants.MATRIX_TRACE_CLASS为”com/tencent/matrix/trace/core/AppMethodBeat”。<code>mv.visitMethodInsn</code>这行代码表示插入静态方法<code>AppMethodBeat.i()</code>。</p>
+<h5 id="MethodTracer"><a href="#MethodTracer" class="headerlink" title="MethodTracer"></a>MethodTracer</h5><p>下面简单看下MethodTracer都执行了哪些操作</p>
+<h3 id="遗留问题"><a href="#遗留问题" class="headerlink" title="遗留问题"></a>遗留问题</h3><ul>
+<li>编译期动态修改字节码，改了哪些内容？</li>
+<li>UIThreadMonitor.onStart()逻辑，如何配合Choreographer的？</li>
+<li>AnrTask中trace部分的逻辑，比如TraceDataUtils？</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/Tencent/matrix" target="_blank" rel="noopener">Matrix</a></p>
+<p><a href="https://github.com/Tencent/matrix/wiki/Matrix-Android-TraceCanary" target="_blank" rel="noopener">Matrix Wiki</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/26/Android应用启动流程分析/" rel="next" title="Android应用启动流程分析">
+                <i class="fa fa-chevron-left"></i> Android应用启动流程分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">hningoba</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Trace-Canary主要特性"><span class="nav-text">Trace Canary主要特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#帧率检测"><span class="nav-text">帧率检测</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#TestFpsActivity："><span class="nav-text">TestFpsActivity：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#IDoFrameListener-doFrameAsync-："><span class="nav-text">IDoFrameListener.doFrameAsync()：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#FrameTracer-notifyListener-："><span class="nav-text">FrameTracer.notifyListener()：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#FrameTracer-doFrame"><span class="nav-text">FrameTracer.doFrame():</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#UIThreadMonitor-dispatchEnd"><span class="nav-text">UIThreadMonitor.dispatchEnd()</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#LooperMonitor-dispatch"><span class="nav-text">LooperMonitor.dispatch():</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#LooperMonitor-LooperPrinter"><span class="nav-text">LooperMonitor.LooperPrinter:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Looper-loop"><span class="nav-text">Looper.loop():</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#整体代码执行过程："><span class="nav-text">整体代码执行过程：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#总结："><span class="nav-text">总结：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ANR检测"><span class="nav-text">ANR检测</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#AnrTracer："><span class="nav-text">AnrTracer：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#AnrTask："><span class="nav-text">AnrTask：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#总结：-1"><span class="nav-text">总结：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#慢函数检测"><span class="nav-text">慢函数检测</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#EvilMethodTracer："><span class="nav-text">EvilMethodTracer：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#AnalyseTask"><span class="nav-text">AnalyseTask:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#总结：-2"><span class="nav-text">总结：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动耗时检测"><span class="nav-text">启动耗时检测</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#三种启动方式："><span class="nav-text">三种启动方式：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#冷启动分析"><span class="nav-text">冷启动分析</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#StartupTracer："><span class="nav-text">StartupTracer：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Application初始化耗时："><span class="nav-text">Application初始化耗时：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ActivityThreadHacker："><span class="nav-text">ActivityThreadHacker：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Launch-Activity初始化耗时检测："><span class="nav-text">Launch Activity初始化耗时检测：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#总结：-3"><span class="nav-text">总结：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Trace插桩"><span class="nav-text">Trace插桩</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#MethodTracer"><span class="nav-text">MethodTracer</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#遗留问题"><span class="nav-text">遗留问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hningoba</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
