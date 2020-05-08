@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="Matrix是WeChat研发的一款APM工具，可以对应用安装包大小，帧率变化，启动耗时，卡顿，慢方法，SQLite 操作优化，文件读写，内存泄漏等等做检测。该库的主要贡献者同时也是《Android开发高手课》的作者，对APP性能感兴趣的同学也可以深入看看该课程。">
+<meta name="description" content="Matrix是WeChat研发的一款APM工具，可以对应用安装包大小，帧率变化，启动耗时，卡顿，慢方法，SQLite 操作优化，文件读写，内存泄漏等等做检测。该库的主要贡献者同时也是《Android开发高手课》的作者，这个课程对APP性能涉及到的技术讲的比较广泛也很有深度，可以作为性能优化的理论指导课，建议对性能优化感兴趣的同学也深入学习下该课程。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Matrix概览">
 <meta property="og:url" content="https://hningoba.github.io/2020/04/28/Matrix概览/index.html">
 <meta property="og:site_name" content="自律使人自由">
-<meta property="og:description" content="Matrix是WeChat研发的一款APM工具，可以对应用安装包大小，帧率变化，启动耗时，卡顿，慢方法，SQLite 操作优化，文件读写，内存泄漏等等做检测。该库的主要贡献者同时也是《Android开发高手课》的作者，对APP性能感兴趣的同学也可以深入看看该课程。">
+<meta property="og:description" content="Matrix是WeChat研发的一款APM工具，可以对应用安装包大小，帧率变化，启动耗时，卡顿，慢方法，SQLite 操作优化，文件读写，内存泄漏等等做检测。该库的主要贡献者同时也是《Android开发高手课》的作者，这个课程对APP性能涉及到的技术讲的比较广泛也很有深度，可以作为性能优化的理论指导课，建议对性能优化感兴趣的同学也深入学习下该课程。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-04-28T10:56:17.328Z">
+<meta property="og:updated_time" content="2020-05-08T13:08:22.579Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Matrix概览">
-<meta name="twitter:description" content="Matrix是WeChat研发的一款APM工具，可以对应用安装包大小，帧率变化，启动耗时，卡顿，慢方法，SQLite 操作优化，文件读写，内存泄漏等等做检测。该库的主要贡献者同时也是《Android开发高手课》的作者，对APP性能感兴趣的同学也可以深入看看该课程。">
+<meta name="twitter:description" content="Matrix是WeChat研发的一款APM工具，可以对应用安装包大小，帧率变化，启动耗时，卡顿，慢方法，SQLite 操作优化，文件读写，内存泄漏等等做检测。该库的主要贡献者同时也是《Android开发高手课》的作者，这个课程对APP性能涉及到的技术讲的比较广泛也很有深度，可以作为性能优化的理论指导课，建议对性能优化感兴趣的同学也深入学习下该课程。">
 
 
 
@@ -331,8 +331,9 @@
       
 
       
-        <p>Matrix是WeChat研发的一款APM工具，可以对应用安装包大小，帧率变化，启动耗时，卡顿，慢方法，SQLite 操作优化，文件读写，内存泄漏等等做检测。该库的主要贡献者同时也是<a href="https://time.geekbang.org/column/intro/100021101" target="_blank" rel="noopener">《Android开发高手课》</a>的作者，对APP性能感兴趣的同学也可以深入看看该课程。</p>
+        <p>Matrix是WeChat研发的一款APM工具，可以对应用安装包大小，帧率变化，启动耗时，卡顿，慢方法，SQLite 操作优化，文件读写，内存泄漏等等做检测。该库的主要贡献者同时也是<a href="https://time.geekbang.org/column/intro/100021101" target="_blank" rel="noopener">《Android开发高手课》</a>的作者，这个课程对APP性能涉及到的技术讲的比较广泛也很有深度，可以作为性能优化的理论指导课，建议对性能优化感兴趣的同学也深入学习下该课程。</p>
 <a id="more"></a>
+<p>笔者近期在组里承担了一些性能优化的工作，写Matrix的分析文章目的其实是为了从原理层面了解业界对各种性能指标的检测方法，从而更系统的学习性能优化这部分知识。</p>
 <p>Matrix-android 当前包含五块内容：</p>
 <ul>
 <li>APK Checker: 针对 APK 安装包的分析检测工具，根据一系列设定好的规则，检测 APK 是否存在特定的问题，并输出较为详细的检测结果报告，用于分析排查问题以及版本追踪</li>
@@ -351,7 +352,8 @@
 <li>自动涵盖卡顿、启动耗时、页面切换、慢函数检测等多个流畅性指标</li>
 </ul>
 <p>具体实现分析参考：<a href="https://hningoba.github.io/2020/04/28/Matrix-TraceCanary实现分析/">TraceCanary实现分析</a></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/Tencent/matrix" target="_blank" rel="noopener">Matrix</a></p>
+<p>其他模块后续补充中。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://github.com/Tencent/matrix" target="_blank" rel="noopener">Matrix</a></p>
 <p><a href="https://github.com/Tencent/matrix/wiki/Matrix-Android-TraceCanary" target="_blank" rel="noopener">Matrix Wiki</a></p>
 
       
@@ -508,7 +510,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Matrix初始化"><span class="nav-text">Matrix初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Trace-Canary"><span class="nav-text">Trace Canary</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Matrix初始化"><span class="nav-text">Matrix初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Trace-Canary"><span class="nav-text">Trace Canary</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
