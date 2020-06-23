@@ -92,7 +92,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_hprof_gcroots.png">
 <meta property="og:image" content="https://hningoba.github.io/2020/06/img/matrix_hprof_record_structure.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_hprof_tag.png">
-<meta property="og:updated_time" content="2020-06-23T14:07:49.823Z">
+<meta property="og:updated_time" content="2020-06-23T14:09:31.691Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Matrix - ResourceCanary源码分析">
 <meta name="twitter:description" content="本文主要介绍Matrix的Resource部分，涉及Activity泄漏、Bitmap冗余对象的检测逻辑。">
@@ -402,7 +402,7 @@
 <h5 id="如何获取Hprof文件"><a href="#如何获取Hprof文件" class="headerlink" title="如何获取Hprof文件"></a>如何获取Hprof文件</h5><p>代码中可以使用<code>Debug.dumpHprofData(file)</code>方法获取Hprof文件。平时开发定位问题，可以直接用AndroidStudio中的Profiler获取hprof文件。官方文档<a href="https://developer.android.com/studio/profile/memory-profiler#save-hprof" target="_blank" rel="noopener">使用 Memory Profiler 查看 Java 堆和内存分配</a>比较详细的介绍了hprof的使用方法，具体可看官网。如果AS底部控制台没有Profiler选项，也可以通过AndroidStudio顶部Run菜单里面的profiler选项启动profiler。</p>
 <p>Profiler目前已经是非常强大且易用的性能分析工具，可以分析CPU使用率、各种内存占用、网络使用、方法耗时等各种指标。笔者平视看代码，获取方法调用栈、分析方法耗时等，也经常使用该工具，比如之前分析Matrix-Trace源码分析文章时，通过Profiler的方法调用栈就比较容易的看到哪些方法是通过插桩实现的，方便快速熟悉陌生的项目，建议大家多学习使用该工具。</p>
 <p>借用官网中提供的图片，下图中的“2”可用于获取hprof文件。平时开发过程中，Rocord一段App操作后，可以把操作后的堆栈信息用这种方式dump出来，后续便可使用AS导入hprof文件，方便分析。</p>
-<p><img src="https://developer.android.com/studio/images/profile/memory-profiler-callouts_2x.png" style="zoom:65%;"></p>
+<p><img src="https://developer.android.com/studio/images/profile/memory-profiler-callouts_2x.png" style="zoom: 50%;"></p>
 <p>将本地Hprof本地文件导入到Profiler中：</p>
 <p><img src="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_profiler_hprof.png" style="zoom:65%;"></p>
 <p>上图中各个列对应含义：</p>
