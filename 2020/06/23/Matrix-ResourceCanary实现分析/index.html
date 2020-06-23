@@ -92,7 +92,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_hprof_gcroots.png">
 <meta property="og:image" content="https://hningoba.github.io/2020/06/img/matrix_hprof_record_structure.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_hprof_tag.png">
-<meta property="og:updated_time" content="2020-06-23T13:35:34.120Z">
+<meta property="og:updated_time" content="2020-06-23T14:04:03.367Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Matrix - ResourceCanary源码分析">
 <meta name="twitter:description" content="本文主要介绍Matrix的Resource部分，涉及Activity泄漏、Bitmap冗余对象的检测逻辑。">
@@ -362,7 +362,7 @@
 <h5 id="获取已销毁Activity的信息"><a href="#获取已销毁Activity的信息" class="headerlink" title="获取已销毁Activity的信息"></a>获取已销毁Activity的信息</h5><p>针对第一个问题“如何在一个恰当的时机得知一个Activity已经结束了生命周期”，我们看看Matrix怎么做的。</p>
 <p>Matrix wiki中也提到的了解决方法：</p>
 <ul>
-<li>让所有Activity继承一个BaseActivity，然后在<code>BaseActivity.onDestroy()</code>方法中进行记录。</li>
+<li>让所有Activity继承一个<code>BaseActivity</code>，然后在<code>BaseActivity.onDestroy()</code>方法中进行记录。</li>
 <li>通过某种机制得知<code>Activity.onDestroy()</code>方法被调用，然后进行记录<ul>
 <li>4.0以前可以通过反射替换<code>ActivityThread.mInstrumentation</code>对象为自己的代理，然后在代理中的<code>callActivityOnDestroy()</code>方法中记录。</li>
 <li>4.0以后可以通过<code>Application.registerActivityLifecycleCallbacks()</code>方法注册一个回调对象，在回调对象的<code>onActivityDestroyed()</code>方法中记录。</li>
