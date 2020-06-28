@@ -92,7 +92,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_hprof_gcroots.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_hprof_record_structure.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_hprof_tag.png">
-<meta property="og:updated_time" content="2020-06-28T13:38:35.444Z">
+<meta property="og:updated_time" content="2020-06-28T13:41:22.792Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Matrix - ResourceCanary源码分析">
 <meta name="twitter:description" content="本文主要介绍Matrix的Resource部分，涉及Activity泄漏、Bitmap对象冗余的检测逻辑。">
@@ -414,7 +414,7 @@
 <li><strong>Shallow Size</strong>：此对象类型使用的 Java 内存总量（以字节为单位）。</li>
 <li><strong>Retained Size</strong>：为此类的所有实例而保留的内存总大小（以字节为单位）。</li>
 </ul>
-<h5 id="如何获取引用链"><a href="#如何获取引用链" class="headerlink" title="如何获取引用链"></a>如何获取引用链</h5><p>前面提到如何获取泄漏Activity的信息，定位问题时，还需要计算泄漏Activity对象到GCRoots的强引用链。GCRoots对象特点是，他们虽然不被其他生命周期更长的对象持有，但JVM特性导致这类对象不会被GC回收。因此，从这类对象出发，经过一系列强引用的对象也都无法被回收。这部分可以看看<a href="https://www.dynatrace.com/resources/ebooks/javabook/how-garbage-collection-works/" target="_blank" rel="noopener">这篇文章</a>。</p>
+<h5 id="如何获取引用链"><a href="#如何获取引用链" class="headerlink" title="如何获取引用链"></a>如何获取引用链</h5><p>前面提到如何获取泄漏Activity的信息，定位问题时，还需要计算泄漏Activity对象到GCRoots的强引用链。GCRoots对象特点是，他们虽然不被其他生命周期更长的对象持有，但JVM特性导致这类对象不会被GC回收。因此，从这类对象出发，经过一系列强引用的对象也都无法被回收。这部分内容可以看看<a href="https://www.dynatrace.com/resources/ebooks/javabook/how-garbage-collection-works/" target="_blank" rel="noopener">这篇文章</a>。</p>
 <p>GCRoots包括下面5类对象：</p>
 <ul>
 <li>静态成员，因为Java中的类，即被JVM system class loader加载的类无法卸载，也就无法被回收，典型的就是类的静态成员以及被静态成员持有的对象都是无法被GC的</li>
@@ -425,7 +425,7 @@
 </ul>
 <p>如果某个Activity被泄漏，则必然存在从它到某个GC Root的强引用链。只要将这条强引用链找出来，开发者就能根据引用链上的对象找到合适的修改点快速解决问题。</p>
 <p>Hprof文件格式可以参考<a href="http://hg.openjdk.java.net/jdk8/jdk8/jdk/raw-file/43cb25339b55/src/share/demo/jvmti/hprof/manual.html#mozTocId848088" target="_blank" rel="noopener">这份文档</a>Binary Dump Format一节，文档中GCRoots的Tag格式如下：</p>
-<p><img src="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_hprof_gcroots.png" style="zoom: 50%;"></p>
+<p><img src="https://raw.githubusercontent.com/hningoba/KnowledgeSummary/master/img/matrix_hprof_gcroots.png" style="zoom: 33%;"></p>
 <p>按照文档描述的格式将Hprof中的实例信息解析成描述引用关系的图结构后，套用经典的图搜索算法即可找到泄漏的Activity到GC Root的强引用链。这部分代码实现，老版的LeakCanary和Matrix都借鉴了<a href="https://github.com/square/haha" target="_blank" rel="noopener">HAHA库</a>的逻辑。目前这个Repo已经被标记为DEPRECATED，最新版的LeakCanary 2自己实现了名叫<a href="https://square.github.io/leakcanary/shark/" target="_blank" rel="noopener">Shark</a>的heap分析库，这个库使用Kotlin实现。</p>
 <h5 id="Hprof文件分析"><a href="#Hprof文件分析" class="headerlink" title="Hprof文件分析"></a>Hprof文件分析</h5><p>Matrix ResourceCanary将检测Activity泄漏和分析泄漏对象的信息整个过程，分成检测和分析两个阶段。前者因为检测Activity泄漏包含很多系统概念，只能在端上做，但是分析阶段是一个处理hprof文件的过程，可以拆出来。拆出来的好处是：</p>
 <ul>
