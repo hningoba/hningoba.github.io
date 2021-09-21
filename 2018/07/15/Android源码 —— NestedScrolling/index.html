@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="NestedScrolling常用在嵌套滚动的场景，比较常见的是使用CoordinateLayout实现比较炫酷的联合滚动效果，其内部也是借助了NestedScrollingChild和NestedScrollingParent这套机制。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android源码 —— NestedScrolling">
+<meta property="og:url" content="https://hningoba.github.io/2018/07/15/Android源码 —— NestedScrolling/index.html">
+<meta property="og:site_name" content="自律使人自由">
+<meta property="og:description" content="NestedScrolling常用在嵌套滚动的场景，比较常见的是使用CoordinateLayout实现比较炫酷的联合滚动效果，其内部也是借助了NestedScrollingChild和NestedScrollingParent这套机制。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-09-21T07:04:23.874Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android源码 —— NestedScrolling">
+<meta name="twitter:description" content="NestedScrolling常用在嵌套滚动的场景，比较常见的是使用CoordinateLayout实现比较炫酷的联合滚动效果，其内部也是借助了NestedScrollingChild和NestedScrollingParent这套机制。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://hningoba.github.io/2018/07/15/Android源码 —— NestedScrolling/"/>
+
+
+
+
+
+  <title>Android源码 —— NestedScrolling | 自律使人自由</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">自律使人自由</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2018/07/15/Android源码 —— NestedScrolling/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hningoba">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律使人自由">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android源码 —— NestedScrolling</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-15T02:19:42+08:00">
+                2018-07-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>NestedScrolling常用在嵌套滚动的场景，比较常见的是使用CoordinateLayout实现比较炫酷的联合滚动效果，其内部也是借助了NestedScrollingChild和NestedScrollingParent这套机制。<br><a id="more"></a></p>
+<h3 id="NestedScrollingChild和NestedScrollingParent"><a href="#NestedScrollingChild和NestedScrollingParent" class="headerlink" title="NestedScrollingChild和NestedScrollingParent"></a>NestedScrollingChild和NestedScrollingParent</h3><table>
+<thead>
+<tr>
+<th>NestedScrollingChild</th>
+<th>NestedScrollingParent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>startNestedScroll</td>
+<td>onStartNestedScroll</td>
+</tr>
+<tr>
+<td>dispatchNestedPreScroll</td>
+<td>onNestedPreScroll</td>
+</tr>
+<tr>
+<td>dispatchNestedScroll</td>
+<td>onNestedScroll</td>
+</tr>
+<tr>
+<td>dispatchNestedPreFling</td>
+<td>onNestedPreFling</td>
+</tr>
+<tr>
+<td>dispatchNestedFling</td>
+<td>onNestedFling</td>
+</tr>
+<tr>
+<td>stopNestedScroll</td>
+<td>onStopNestedScroll</td>
+</tr>
+</tbody>
+</table>
+<p>NestedScrollingChild接口中的方法均为主动方法，需要我们在实现类中主动调用，而NestedScrollingParent的方法基本都是回调方法。这也是NestedScrolling机制的一个体现，子View作为NestedScrolling事件传递的主动方，父View作为接收方。父View决定是移动子View控件，还是把移动偏移量交给子View，让其滚动内容。</p>
+<h3 id="NestedScrolling事件传递过程："><a href="#NestedScrolling事件传递过程：" class="headerlink" title="NestedScrolling事件传递过程："></a>NestedScrolling事件传递过程：</h3><p>子View的事件处理过程都在onTouchEvent()。</p>
+<ol>
+<li>子View在action down中执行startNestedScroll()启动联动流程，并设置滚动的方向；</li>
+<li>父View在onStartNestedScroll()中根据传来的方向，决定是否联动，返回结果；</li>
+<li>子View在action move中计算移动偏移量，执行dispatchNestedPreScroll()，将偏移情况告诉父View；</li>
+<li>父View在onNestedPreScroll()中接收子View传来的偏移量，计算需要消耗的偏移量，即移动子View的距离；</li>
+<li>子View计算父View消费后剩下的偏移量，在这个余量基础上计算子View还能消费多少，并把消费情况通过dispatchNestedScroll()告诉父View；</li>
+<li>父View在onNestedScroll()中根据偏移量进行相应处理；</li>
+<li>事件结束，子View在action up中执行stopNestedScroll()结束联动流程，父View的onStopNestedScroll()得到响应，事件传递完成。</li>
+</ol>
+<p>上述联动过程的传递，通过NestedScrollingChildHelper和NestedScrollingParentHelper这爷俩就可简单实现，里面封装了很多实现细节，让我们开发过程更高效。</p>
+<p>fling过程和上述相同，可以通过示例代码了解。</p>
+<p>下面通过代码讲一讲上述流程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">class ChildView implements NestedScrollingChild &#123; </span><br><span class="line">	</span><br><span class="line">	@Override</span><br><span class="line">	public boolean onTouchEvent(MotionEvent event) &#123; </span><br><span class="line">	    boolean result = false; </span><br><span class="line">	</span><br><span class="line">	    MotionEvent trackedEvent = MotionEvent.obtain(event); </span><br><span class="line">	</span><br><span class="line">	    final int action = MotionEventCompat.getActionMasked(event); </span><br><span class="line">	</span><br><span class="line">	    if (action == MotionEvent.ACTION_DOWN) &#123; </span><br><span class="line">	        mNestedYOffset = 0; </span><br><span class="line">	    &#125; </span><br><span class="line">	</span><br><span class="line">	    int y = (int) event.getY(); </span><br><span class="line">	    event.offsetLocation(0, mNestedYOffset); </span><br><span class="line">	</span><br><span class="line">	    switch (action) &#123; </span><br><span class="line">	        case MotionEvent.ACTION_DOWN: </span><br><span class="line">	            mLastMotionY = y; </span><br><span class="line">	            // 1.开始嵌套滚动，并确定滚动方向</span><br><span class="line">	            startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL); </span><br><span class="line">	            result = super.onTouchEvent(event); </span><br><span class="line">	            break;</span><br><span class="line">	        </span><br><span class="line">	        case MotionEvent.ACTION_MOVE: </span><br><span class="line">	            int deltaY = mLastMotionY - y; </span><br><span class="line">	            </span><br><span class="line">	            // 3.子View计算偏移量传给父View</span><br><span class="line">	            if (dispatchNestedPreScroll(0, deltaY, mScrollConsumed, mScrollOffset)) &#123; </span><br><span class="line">	                // mScrollConsumed 保存被parent消费的尺寸 </span><br><span class="line">	                deltaY -= mScrollConsumed[1]; </span><br><span class="line">	                trackedEvent.offsetLocation(0, mScrollOffset[1]); </span><br><span class="line">	                mNestedYOffset += mScrollOffset[1]; </span><br><span class="line">	            &#125; </span><br><span class="line">	</span><br><span class="line">	            mLastMotionY = y - mScrollOffset[1]; </span><br><span class="line">	</span><br><span class="line">				// 5.根据父View消费后的偏移余量，计算自己还能用多少，还能再剩下多少给父View继续使用</span><br><span class="line">	            int oldY = getScrollY(); </span><br><span class="line">	            int newScrollY = Math.max(0, oldY + deltaY); </span><br><span class="line">	            int dyConsumed = newScrollY - oldY;</span><br><span class="line">	            int dyUnconsumed = deltaY - dyConsumed; </span><br><span class="line">	</span><br><span class="line">	            if (dispatchNestedScroll(0, dyConsumed, 0, dyUnconsumed, mScrollOffset)) &#123; </span><br><span class="line">	                mLastMotionY -= mScrollOffset[1]; </span><br><span class="line">	                trackedEvent.offsetLocation(0, mScrollOffset[1]); </span><br><span class="line">	                mNestedYOffset += mScrollOffset[1]; </span><br><span class="line">	            &#125; </span><br><span class="line">	</span><br><span class="line">	            result = super.onTouchEvent(trackedEvent); </span><br><span class="line">	            trackedEvent.recycle(); </span><br><span class="line">	            break;</span><br><span class="line">	        case MotionEvent.ACTION_POINTER_DOWN: </span><br><span class="line">	        case MotionEvent.ACTION_UP: </span><br><span class="line">	        case MotionEvent.ACTION_CANCEL: </span><br><span class="line">        		// 7.结束流程</span><br><span class="line">	            stopNestedScroll();</span><br><span class="line">	            result = super.onTouchEvent(event); </span><br><span class="line">	            break;</span><br><span class="line">	    &#125; </span><br><span class="line">	    return result; </span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">class ParentView implements NestedScrollParent &#123; </span><br><span class="line"></span><br><span class="line">	// 2.父View根据传来的方向，决定是否联动</span><br><span class="line">	@Override</span><br><span class="line">	public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) &#123; </span><br><span class="line">		return (nestedScrollAxes &amp; ViewCompat.SCROLL_AXIS_VERTICAL) != 0;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	// 4.计算需要消耗的偏移量，移动子View</span><br><span class="line">	@Override</span><br><span class="line">	public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) &#123; </span><br><span class="line">	    if (dy &gt; 0) &#123;</span><br><span class="line">		    int dyCanConsumed = mTargetCurOffset - mTargetEndOffset;</span><br><span class="line">		    if (dy &gt;= dyCanConsumed) &#123;</span><br><span class="line">		        consumed[1] = dyCanConsumed;</span><br><span class="line">		        moveTo(mTargetEndOffset);</span><br><span class="line">		    &#125; else &#123;</span><br><span class="line">		        consumed[1] = dy;</span><br><span class="line">		        moveBy(-dy);</span><br><span class="line">		    &#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	// 6.父View根据子View的计算结果，做相关处理</span><br><span class="line">	@Override</span><br><span class="line">	public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) &#123;</span><br><span class="line">	    if (dyUnconsumed &lt; 0) &#123;</span><br><span class="line">	        moveBy(-dyUnconsumed);</span><br><span class="line">	    &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="相关问题"><a href="#相关问题" class="headerlink" title="相关问题:"></a>相关问题:</h3><p>1.子View主动触发一个事件，父View的对应方法就能响应，那父子View的联动关系是如何确定的？<br>看下NestScrollingChildHelper#startNestedScroll()的实现。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public boolean startNestedScroll(int axes) &#123; </span><br><span class="line">    if (hasNestedScrollingParent()) &#123; </span><br><span class="line">        // Already in progress </span><br><span class="line">        return true; </span><br><span class="line">    &#125; </span><br><span class="line">    if (isNestedScrollingEnabled()) &#123; </span><br><span class="line">        ViewParent p = mView.getParent(); </span><br><span class="line">        View child = mView; </span><br><span class="line"></span><br><span class="line">        // 向上遍历找parent，直到找到实现NestScrollParentHelper.onStartNestScroll()返回true的parent</span><br><span class="line">        // 注意，ViewGroup也实现了NestScrollParentHelper，但是onStartNestScroll()返回false</span><br><span class="line">        while (p != null) &#123; </span><br><span class="line">            if (ViewParentCompat.onStartNestedScroll(p, child, mView, axes)) &#123; </span><br><span class="line">                mNestedScrollingParent = p; </span><br><span class="line">                ViewParentCompat.onNestedScrollAccepted(p, child, mView, axes); </span><br><span class="line">                return true;</span><br><span class="line">            &#125; </span><br><span class="line">            if (p instanceof View) &#123; </span><br><span class="line">                child = (View) p;</span><br><span class="line">            &#125; </span><br><span class="line">            p = p.getParent();</span><br><span class="line">        &#125; </span><br><span class="line">    &#125;</span><br><span class="line">    return false; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="相关知识点："><a href="#相关知识点：" class="headerlink" title="相关知识点："></a>相关知识点：</h3><p>1.View#canScrollVertically()</p>
+<p>判断View在垂直方向是否可以上下滚动。<br>其中：<br>View#canScrollVertically(1)，return true ——可以向上滚动，反之，不可以<br>View#canScrollVertically(-1)，return true ——可以向下滚动，反之，不可以 </p>
+<p>2.View#computeVerticalScrollOffset()</p>
+<p>判断View的内容在垂直方向上滚动的距离。返回值：0~***，均为正值。<br>比如WebView，起始状态为0，内容向上滚动后，为某个正值。 </p>
+<p>3.View#computeVerticalScrollRange()</p>
+<p>View内容的总高度。 </p>
+<p>4.View#computeVerticalScrollExtent()<br>View在屏幕区域内显示的高度。 </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/15/SpringBoot Kotlin热部署采坑/" rel="next" title="SpringBoot Kotlin热部署采坑">
+                <i class="fa fa-chevron-left"></i> SpringBoot Kotlin热部署采坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/12/通用技术 —— 依赖注入和控制反转/" rel="prev" title="通用技术 —— 依赖注入和控制反转">
+                通用技术 —— 依赖注入和控制反转 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">hningoba</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#NestedScrollingChild和NestedScrollingParent"><span class="nav-text">NestedScrollingChild和NestedScrollingParent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NestedScrolling事件传递过程："><span class="nav-text">NestedScrolling事件传递过程：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关问题"><span class="nav-text">相关问题:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关知识点："><span class="nav-text">相关知识点：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hningoba</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

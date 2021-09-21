@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="平时开发中大家是否会遇到这些问题：  一个方法几百行，一个类上万行，不敢轻易修改这个类，即便只是为了熟悉业务阅读代码，血压也会升高 开发新业务时想复用老的服务，却发现复用比重写一套还困难 集合操作明明有简洁的api，却出现很多重复的for循环  每个项目的代码都有槽点，除了编码新功能，我们也需要不定期对不合格的老代码进行重构，从而提高代码的可读性、扩展性。近期重读《重构》，把一些好用的理念整理出来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通用技术 —— 怎样写出优雅的代码">
+<meta property="og:url" content="https://hningoba.github.io/2021/08/01/通用技术 —— 怎样写出优雅的代码/index.html">
+<meta property="og:site_name" content="自律使人自由">
+<meta property="og:description" content="平时开发中大家是否会遇到这些问题：  一个方法几百行，一个类上万行，不敢轻易修改这个类，即便只是为了熟悉业务阅读代码，血压也会升高 开发新业务时想复用老的服务，却发现复用比重写一套还困难 集合操作明明有简洁的api，却出现很多重复的for循环  每个项目的代码都有槽点，除了编码新功能，我们也需要不定期对不合格的老代码进行重构，从而提高代码的可读性、扩展性。近期重读《重构》，把一些好用的理念整理出来">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-09-21T07:05:06.486Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通用技术 —— 怎样写出优雅的代码">
+<meta name="twitter:description" content="平时开发中大家是否会遇到这些问题：  一个方法几百行，一个类上万行，不敢轻易修改这个类，即便只是为了熟悉业务阅读代码，血压也会升高 开发新业务时想复用老的服务，却发现复用比重写一套还困难 集合操作明明有简洁的api，却出现很多重复的for循环  每个项目的代码都有槽点，除了编码新功能，我们也需要不定期对不合格的老代码进行重构，从而提高代码的可读性、扩展性。近期重读《重构》，把一些好用的理念整理出来">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://hningoba.github.io/2021/08/01/通用技术 —— 怎样写出优雅的代码/"/>
+
+
+
+
+
+  <title>通用技术 —— 怎样写出优雅的代码 | 自律使人自由</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">自律使人自由</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2021/08/01/通用技术 —— 怎样写出优雅的代码/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hningoba">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律使人自由">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">通用技术 —— 怎样写出优雅的代码</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-08-01T18:36:36+08:00">
+                2021-08-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>平时开发中大家是否会遇到这些问题：</p>
+<ul>
+<li>一个方法几百行，一个类上万行，不敢轻易修改这个类，即便只是为了熟悉业务阅读代码，血压也会升高</li>
+<li>开发新业务时想复用老的服务，却发现复用比重写一套还困难</li>
+<li>集合操作明明有简洁的api，却出现很多重复的for循环</li>
+</ul>
+<p>每个项目的代码都有槽点，除了编码新功能，我们也需要不定期对不合格的老代码进行重构，从而提高代码的可读性、扩展性。近期重读《重构》，把一些好用的理念整理出来，分享给大家。</p>
+<a id="more"></a>
+<h1 id="收敛可变范围"><a href="#收敛可变范围" class="headerlink" title="收敛可变范围"></a>收敛可变范围</h1><p>《重构》的作者认为“可变数据(mutable data)是软件错误的最大源头之一”，我比较认同这个观点。把数据的读写权限完全放开，看起来对业务修改数据更方便，但业务复杂之后，对数据的修改经常导致出乎意料的结果和难以发现的bug。在一处更新数据，却没有意识到另一处期望着完全不同的数据，于是一个功能失效了。如果是偶现bug，要找出问题的根源就会更加困难。解决这类问题可以减少对变量的依赖，将可变数据的写权限限制在较小范围。外部需要完整数据时，如果可以的话，请返回原始数据的副本。</p>
+<h3 id="以查询取代派生变量-Replace-Derived-Variable-with-Query"><a href="#以查询取代派生变量-Replace-Derived-Variable-with-Query" class="headerlink" title="以查询取代派生变量 Replace Derived Variable with Query"></a>以查询取代派生变量 Replace Derived Variable with Query</h3><p>有些结果可以在获取时即时计算，不需要声明一个类变量实时维护。</p>
+<p>下面这个例子，使用类变量mProduction记录所有mAdjustments元素中amount总和。在每次添加新的adjustment时，mProduction都需要更新。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">fun applyAdjustment(anAdjustment: Adjustment) &#123;</span><br><span class="line"></span><br><span class="line">    mAdjustments.add(anAdjustment)</span><br><span class="line"></span><br><span class="line">    mProduction += anAdjustment.amount</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fun getProduction() = mProduction</span><br></pre></td></tr></table></figure>
+<p>按照“以查询取代派生变量”的思路，可以对mAdjustments即时计算来获取amount总和，这样可以减少类变量的维护成本。使用Collection的pipeline api，同时对方法的名字进行微调，修改后的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fun getDiscontedTotal() = mAdjustments.map &#123; it.amount &#125;.sum()</span><br></pre></td></tr></table></figure>
+<h3 id="避免修改方法入参"><a href="#避免修改方法入参" class="headerlink" title="避免修改方法入参"></a>避免修改方法入参</h3><p>下面这个例子，入参inputValue不仅在方法体中被修改，还作为方法的返回值使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public int discount(int inputValue) &#123;</span><br><span class="line"></span><br><span class="line">    if (inputValue &gt; 50) inputValue = inputValue - 2;</span><br><span class="line"></span><br><span class="line">    return inputValue;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在Java中，经历这个方法后，外部传入的inputValue将会被修改，这种隐式变化会影响调用方的数据准确性，并且不会有任何提示。但在Kotlin中，方法参数是Val类型，不允许在方法体内被修改，所以数据不会出现这种隐式变化，也就减少bug产生的概率。这也是我更喜欢Kotlin的原因之一。</p>
+<p>给入参inputValue换个更贴切的名字，方法体内使用局部变量进行逻辑处理，返回值也改用局部变量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public int discount(int originalInputValue) &#123;</span><br><span class="line"></span><br><span class="line">    int result = originalInputValue;</span><br><span class="line"></span><br><span class="line">    if (originalInputValue &gt; 50) result = originalInputValue - 2;</span><br><span class="line"></span><br><span class="line">    return result;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="拆分变量-Split-Variable"><a href="#拆分变量-Split-Variable" class="headerlink" title="拆分变量 Split Variable"></a>拆分变量 Split Variable</h3><p>如果一个变量在不同时刻表达不同内容，可以通过拆分变量保证一个变量只有一个用途。虽然看似变量多了，但代码逻辑更清晰。少出几个bug，也是提高研发效率的手段。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">var result = 2 * (height + width)</span><br><span class="line"></span><br><span class="line">println(result)</span><br><span class="line"></span><br><span class="line">result = height * width</span><br><span class="line"></span><br><span class="line">println(result)</span><br></pre></td></tr></table></figure>
+<p>通过拆分变量，以及使用合适的变量命名：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">val perimeter = 2 * (height + width)</span><br><span class="line"></span><br><span class="line">println(perimeter)</span><br><span class="line"></span><br><span class="line">val area = height * width</span><br><span class="line"></span><br><span class="line">println(area)</span><br></pre></td></tr></table></figure>
+<h3 id="函数组合成类-Combine-Functions-into-Class"><a href="#函数组合成类-Combine-Functions-into-Class" class="headerlink" title="函数组合成类 Combine Functions into Class"></a>函数组合成类 Combine Functions into Class</h3><p>如果一个类的几个函数形影不离的操作同一块数据，且这部分数据的读写范围可控，数据表达的概念相对独立，那么可以把这些函数连同变量独立成类。</p>
+<p>类能明确的给这些函数提供一个共用的环境，在对象内部调用这些函数可以少传许多参数，从而简化函数调用。除了把已有的函数组织起来，重构过程中，我们还会有机会发现其他的数据计算逻辑，一并提取到新建的类中，进而简化原有类。</p>
+<p>下面这个例子，为业务View添加了滑动帧率的性能监控，较多代码（例子已经简化过）和BizView的业务逻辑并不相关，这种场景就可以利用“函数组合成类”，把monitor、reporter、handle等逻辑独立成类，抽象为性能监控服务支撑业务。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">class BizView &#123;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    val bizScene = ...</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    val frameRateMonitor by lazy &#123;</span><br><span class="line"></span><br><span class="line">        val monitor = FrameRateMonitor(bizScene)</span><br><span class="line"></span><br><span class="line">        monitor.setIFrameRateCallBack &#123;</span><br><span class="line"></span><br><span class="line">            handleFrameRateCallback(it, bizScene)</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        monitor</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    val frameRateReporter by lazy &#123; ... &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    private fun handleFrameRateCallback(fps: Double, bizScene: String) &#123;</span><br><span class="line"></span><br><span class="line">        // 构建监控数据</span><br><span class="line"></span><br><span class="line">        // 监控上报</span><br><span class="line"></span><br><span class="line">        frameRateReporter.report(...)</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    fun createView() &#123;</span><br><span class="line"></span><br><span class="line">        // view初始化</span><br><span class="line"></span><br><span class="line">        // 启动性能监控</span><br><span class="line"></span><br><span class="line">        frameRateMonitor.startMonitor(scrollView)</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="分离查询函数和修改函数-Separate-Query-from-Modifier"><a href="#分离查询函数和修改函数-Separate-Query-from-Modifier" class="headerlink" title="分离查询函数和修改函数 Separate Query from Modifier"></a>分离查询函数和修改函数 Separate Query from Modifier</h3><p>我们在设计方法时，如果一个方法既有查询功能，又有修改或和查询无关的逻辑，那么可以将查询和修改进行函数分离，确保调用者不会调用到有副作用的代码。</p>
+<p>下面这个方法，遍历一份people名单，检查是否混进了miscreant。如果发现了miscreant，该函数会返回miscreant的名字，并拉响警报。如果人群中有多名miscreant，该函数也只汇报找出的第一名miscreant。alertForMiscreant()可谓身兼多职。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">fun alertForMiscreant(people: ArrayList&lt;People&gt;): String &#123;</span><br><span class="line"></span><br><span class="line">    people.forEach &#123; p -&gt;</span><br><span class="line"></span><br><span class="line">        if (p.name === &quot;Don&quot;) &#123;</span><br><span class="line"></span><br><span class="line">            setOffAlarms()</span><br><span class="line"></span><br><span class="line">            return &quot;Don&quot;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (p.name === &quot;John&quot;) &#123;</span><br><span class="line"></span><br><span class="line">            setOffAlarms();</span><br><span class="line"></span><br><span class="line">            return &quot;John&quot;;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return &quot;&quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用分离逻辑，把查找miscreant的功能抽离出来变成findMiscreant()，让alertForMiscreant()只做警报功能，这样两个方法的职责更清晰。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">fun alertForMiscreant(people: ArrayList&lt;People&gt;) &#123;</span><br><span class="line"></span><br><span class="line">    if (findMiscreant(people).isNotEmpty()) &#123;</span><br><span class="line"></span><br><span class="line">        setOffAlarms()</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fun findMiscreant(people: ArrayList&lt;People&gt;): String &#123;</span><br><span class="line"></span><br><span class="line">    people.forEach &#123; p -&gt;</span><br><span class="line"></span><br><span class="line">        if (p.name === &quot;Don&quot;) &#123;</span><br><span class="line"></span><br><span class="line">            return &quot;Don&quot;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (p.name === &quot;John&quot;) &#123;</span><br><span class="line"></span><br><span class="line">            return &quot;John&quot;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return &quot;&quot;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="简化条件表达式"><a href="#简化条件表达式" class="headerlink" title="简化条件表达式"></a>简化条件表达式</h1><p>《重构》的作者提到自己听过这样的观点“所有的条件逻辑都应该用多态取代，绝大多数if语句都应该被扫进历史的垃圾桶”。虽然实际编码中我们不会这么激进的理解条件表达式，但是条件表达式如果有非常复杂的分支结构，修改起来确实痛苦，还容易产生bug。更过分的case是，有些表达式的分支顺序有隐式依赖，比如调整分支的顺序就会引发奇怪的bug。</p>
+<h3 id="以多态取代条件表达式-Replace-Conditional-with-Polymorphism"><a href="#以多态取代条件表达式-Replace-Conditional-with-Polymorphism" class="headerlink" title="以多态取代条件表达式 Replace Conditional with Polymorphism"></a>以多态取代条件表达式 Replace Conditional with Polymorphism</h3><p>下面这个例子，Adapter中需要用到各种尺寸类型的乐高View，仅乐高View的初始化和数据刷新工作就占据Adapter类的较大篇幅。以后如果希望再加一种尺寸的乐高View，还会直接动到这个庞杂的Adapter。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">class LegoViewAdapter &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun createItemView(parent: ViewGroup, viewType: Int): View &#123;</span><br><span class="line"></span><br><span class="line">        if (viewType == Size.Largest) &#123;</span><br><span class="line"></span><br><span class="line">            // create largest card view</span><br><span class="line"></span><br><span class="line">        &#125; else if (viewType == Size.Larger) &#123;</span><br><span class="line"></span><br><span class="line">            // create larger card view</span><br><span class="line"></span><br><span class="line">        &#125; else if (viewType == Size.Large) &#123;</span><br><span class="line"></span><br><span class="line">            // create large card view</span><br><span class="line"></span><br><span class="line">        &#125; else if (viewType == Size.Normal) &#123;</span><br><span class="line"></span><br><span class="line">            // create normal card view</span><br><span class="line"></span><br><span class="line">        &#125; else if (viewType == Size.Small) &#123;</span><br><span class="line"></span><br><span class="line">            // create small card view</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    override fun bindData(view: View, position: Int, data: Any) &#123;</span><br><span class="line"></span><br><span class="line">        if (view is LargestView) &#123;</span><br><span class="line"></span><br><span class="line">            view.update(data)</span><br><span class="line"></span><br><span class="line">        &#125; else if (view is LargerView) &#123;</span><br><span class="line"></span><br><span class="line">            view.update(data)</span><br><span class="line"></span><br><span class="line">        &#125; else if (view is LargeView) &#123;</span><br><span class="line"></span><br><span class="line">            view.update(data)</span><br><span class="line"></span><br><span class="line">        &#125; else if (view is NormalView) &#123;</span><br><span class="line"></span><br><span class="line">            view.update(data)</span><br><span class="line"></span><br><span class="line">        &#125; else if (view is SmallView) &#123;</span><br><span class="line"></span><br><span class="line">            view.update(data)</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果使用多态优化乐高View的初始化和View刷新逻辑的条件分支：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">class LegoViewAdapter &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun createItemView(parent: ViewGroup, viewType: Int): View &#123;</span><br><span class="line"></span><br><span class="line">        // 将View的创建托管给工厂</span><br><span class="line"></span><br><span class="line">        return LegoViewFactory.create(viewType)</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    override fun bindData(view: View, position: Int, data: Any) &#123;</span><br><span class="line"></span><br><span class="line">        // safety check</span><br><span class="line"></span><br><span class="line">        if (view !is ILegoView) &#123;</span><br><span class="line"></span><br><span class="line">            // debug模式下可以激进处理，暴露问题</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        view.update(data)</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 使用工厂模式创建Lego View</span><br><span class="line"></span><br><span class="line">object LegoViewFactory &#123;</span><br><span class="line"></span><br><span class="line">    fun create(viewType: Int): View &#123;</span><br><span class="line"></span><br><span class="line">        when (viewType) &#123;</span><br><span class="line"></span><br><span class="line">            Size.Largest -&gt; LargestView()</span><br><span class="line"></span><br><span class="line">            Size.Larger -&gt; LargerView()</span><br><span class="line"></span><br><span class="line">            Size.Large -&gt; LargeView()</span><br><span class="line"></span><br><span class="line">            Size.Normal -&gt; NormalView()</span><br><span class="line"></span><br><span class="line">            Size.Small -&gt; SmallView</span><br><span class="line"></span><br><span class="line">            ...</span><br><span class="line"></span><br><span class="line">            else -&gt; EmptyLegoView()</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 乐高View引入基类是为了处理View的公共逻辑</span><br><span class="line"></span><br><span class="line">// 乐高View抽象出接口ILegoView表达基本能力</span><br><span class="line"></span><br><span class="line">class BaseLegoView : ILegoView &#123;</span><br><span class="line"></span><br><span class="line">    override fun update() &#123;</span><br><span class="line"></span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>引入多态，将各种尺寸的乐高View组装成一套继承体系</li>
+<li>乐高View的初始化从Adapter中迁移出来，交给工厂，简洁Adapter的同时，提高乐高的复用性</li>
+<li>引入乐高基类，表达公共逻辑</li>
+</ol>
+<h3 id="以卫语句取代嵌套条件表达式-Replace-Nested-Conditional-with-Guard-Clauses"><a href="#以卫语句取代嵌套条件表达式-Replace-Nested-Conditional-with-Guard-Clauses" class="headerlink" title="以卫语句取代嵌套条件表达式 Replace Nested Conditional with Guard Clauses"></a>以卫语句取代嵌套条件表达式 Replace Nested Conditional with Guard Clauses</h3><p>条件分支中，往往会有一些分支用来处理异常或特定情况，那就应该从条件表达式中抽离该分支，在条件表达式前面单独判断，减少分支结构。这样单独检查的语句称为卫语句(guard clauses)。</p>
+<p>下面例子有多个特定分支，即dead、separate、retire。如果把这些特别情况放到条件分支，整个方法非常不优雅。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">fun getPayAmount() &#123;</span><br><span class="line"></span><br><span class="line">    var result = 0</span><br><span class="line"></span><br><span class="line">    if (isDead) &#123;</span><br><span class="line"></span><br><span class="line">        result = deadAmount()</span><br><span class="line"></span><br><span class="line">    &#125; else &#123;</span><br><span class="line"></span><br><span class="line">        if (isSeparated) &#123;</span><br><span class="line"></span><br><span class="line">            result = separatedAmount()</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        else &#123;</span><br><span class="line"></span><br><span class="line">            if (isRetired) &#123;</span><br><span class="line"></span><br><span class="line">                result = retiredAmount()</span><br><span class="line"></span><br><span class="line">            &#125; else &#123;</span><br><span class="line"></span><br><span class="line">                result = normalAmount()</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return result</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用卫语句进行优化：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">fun getPayAmount() &#123;</span><br><span class="line"></span><br><span class="line">    if (isDead) return deadAmount()</span><br><span class="line"></span><br><span class="line">    if (isSeparated) return separatedAmount()</span><br><span class="line"></span><br><span class="line">    if (isRetired) return retiredAmount()</span><br><span class="line"></span><br><span class="line">    return normalAmount()</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="引入特例-Introduce-Special-Case"><a href="#引入特例-Introduce-Special-Case" class="headerlink" title="引入特例 Introduce Special Case"></a>引入特例 Introduce Special Case</h3><p>有些条件分支是用来处理“特例”情况，比如上面“以多态取代条件表达式”的示例，LegoViewFactory中无法识别的viewType就返回一个特例EmptyLegoView。当然，返回null对象作为兜底也是可行的，null对象是特例中的特例。</p>
+<h3 id="引入断言-Introduce-Assertion"><a href="#引入断言-Introduce-Assertion" class="headerlink" title="引入断言 Introduce Assertion"></a>引入断言 Introduce Assertion</h3><p>常常有这样的代码：只有当某个条件为true时，这段代码才会执行。比如方法的入参不能为null，平方根计算只能对正值处理。</p>
+<p>下面这个例子，根据外部传入的数据刷新View前，需要判断下数据是否有效（LegoData的title不能为空），数据有效才能继续执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class LegoView &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    fun update(lego: LegoData) &#123;</span><br><span class="line"></span><br><span class="line">        if (lego.title.isNotEmpty()) &#123;</span><br><span class="line"></span><br><span class="line">            // read data and refresh view</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在实际项目中，无效的数据，往往是代码（数据源）发生了bug。我们希望开发环境能够及时暴露出来，提醒开发者修复bug，减少线上影响面。暴露的方式很多，比如上报到监控平台或debug环境抛出异常等等。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">class LegoView &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    fun update(lego: LegoData) &#123;</span><br><span class="line"></span><br><span class="line">        if (lego.title.isNullOrEmpty()) &#123;</span><br><span class="line"></span><br><span class="line">            // report or throw exception in debug mode</span><br><span class="line"></span><br><span class="line">            return</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // read data and refresh view</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="处理继承关系"><a href="#处理继承关系" class="headerlink" title="处理继承关系"></a>处理继承关系</h1><p>虽然设计原则“组合优于继承”，但继承使用得当，也会有很多好处，比如可以用多态来处理条件逻辑。如果有几个函数都在根据类型码的取值采取不同的行为，多态就显得特别有用。引入子类之后，就可以用“以多态取代条件表达式”来处理这些函数。</p>
+<p>也可以使用简单的重构方法让父类和子类的职责更清晰。比如父类中有几个只在少量子类中使用的方法或变量，那应该把这些成员下放给这些子类，减小父类的维护负担。反之，子类中的成员上移给父类。</p>
+<h3 id="移动成员，让继承职责更清晰"><a href="#移动成员，让继承职责更清晰" class="headerlink" title="移动成员，让继承职责更清晰"></a>移动成员，让继承职责更清晰</h3><p>成员上移：如果某个字段在各个子类中都有用到且含义相同，或者某个方法在各个子类中的函数体大致相同，就需要把这些字段或方法上移到父类中。个别子类的方法实现若有不同，子类可以复写方法。</p>
+<p>成员下移：如果父类中某个字段或方法，只与一个或少许几个子类有关，那最好是把这个成员下移到具体子类中，尽量让父类只处理公共逻辑。</p>
+<h3 id="委托取代继承-Replace-Subclass-with-Delegate"><a href="#委托取代继承-Replace-Subclass-with-Delegate" class="headerlink" title="委托取代继承 Replace Subclass with Delegate"></a>委托取代继承 Replace Subclass with Delegate</h3><p>在部分语言体系，继承有个比较大的短板是“这张牌只能打一次”，即单继承。另外，继承会让类关系耦合加重，比如我们不能为了部分子类的需要，贸然修改父类逻辑，需要明确父类的修改对所有子类都不会产生负面影响。当继承体系复杂后，基类的维护就变得举步维艰。</p>
+<p>下面例子中，Bird继承体系主要表达了鸟的种类，有欧洲燕EuropeanSwallow、非洲燕AfricanSwallow、挪威蓝鹦鹉NorwegianBlueParrot。不同种类的Brid，有不同的airSpeed和plumage。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line">object BirdFactory &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    fun createBird(data: BirdProperty): Bird &#123;</span><br><span class="line"></span><br><span class="line">        return when (data.species) &#123;</span><br><span class="line"></span><br><span class="line">            &quot;EuropeanSwallow&quot; -&gt; EuropeanSwallow(data)</span><br><span class="line"></span><br><span class="line">            &quot;AfricanSwallow&quot; -&gt; AfricanSwallow(data)</span><br><span class="line"></span><br><span class="line">            &quot;NorweigianBlueParrot&quot; -&gt; NorwegianBlueParrot(data)</span><br><span class="line"></span><br><span class="line">            else -&gt; Bird(data)</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">open class Bird(protected val data: BirdProperty) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    open fun getPlumage(): String = &quot;average&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    open fun getAirSpeedVelocity(): Int = -1</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class EuropeanSwallow(data: BirdProperty) : Bird(data) &#123;</span><br><span class="line"></span><br><span class="line">    override fun getAirSpeedVelocity(): Int &#123;</span><br><span class="line"></span><br><span class="line">        return 35</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class AfricanSwallow(data: BirdProperty) : Bird(data) &#123;</span><br><span class="line"></span><br><span class="line">    override fun getAirSpeedVelocity(): Int &#123;</span><br><span class="line"></span><br><span class="line">        return 40 - 2 * data.numberOfCoconuts;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class NorwegianBlueParrot(data: BirdProperty) : Bird(data) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun getPlumage(): String &#123;</span><br><span class="line"></span><br><span class="line">        return if (data.voltage &gt; 100) &#123;</span><br><span class="line"></span><br><span class="line">            &quot;scorched&quot;</span><br><span class="line"></span><br><span class="line">        &#125; else &#123;</span><br><span class="line"></span><br><span class="line">            &quot;beautiful&quot;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun getAirSpeedVelocity(): Int &#123;</span><br><span class="line"></span><br><span class="line">        return if (data.isNailed)</span><br><span class="line"></span><br><span class="line">            0</span><br><span class="line"></span><br><span class="line">        else 10 + data.voltage / 10</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">data class BirdProperty(</span><br><span class="line"></span><br><span class="line">    val species: String,</span><br><span class="line"></span><br><span class="line">    val name: String,</span><br><span class="line"></span><br><span class="line">    val numberOfCoconuts: Int,</span><br><span class="line"></span><br><span class="line">    val voltage: Int,</span><br><span class="line"></span><br><span class="line">    val isNailed: Boolean</span><br><span class="line"></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>如果Bird中有些是野生的，有些是家养的，两类鸟之间有较大差异。容易想到的方式是新建两个子类WildBird和CaptiveBird。由于单继承的限制，我们没办法再用直接继承的方式既表达鸟的种类，还能表达鸟的生存属性。</p>
+<p>那么我们可以通过代理，将鸟的种类逻辑从Bird继承体系中抽离出来：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br></pre></td><td class="code"><pre><span class="line">object BirdFactory &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    fun createBird(data: BirdProperty): Bird &#123;</span><br><span class="line"></span><br><span class="line">        return Bird(selectSpeciesDelegate(data))</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    fun selectSpeciesDelegate(data: BirdProperty): SpeciesDelegate &#123;</span><br><span class="line"></span><br><span class="line">        return when (data. species) &#123;</span><br><span class="line"></span><br><span class="line">            &quot;EuropeanSwallow&quot; -&gt; EuropeanSwallowDelegate(data)</span><br><span class="line"></span><br><span class="line">            &quot;AfricanSwallow&quot; -&gt; AfricanSwallowDelegate(data)</span><br><span class="line"></span><br><span class="line">            &quot;NorweigianBlueParrot&quot; -&gt; NorwegianBlueParrotDelegate(data)</span><br><span class="line"></span><br><span class="line">            else -&gt; SpeciesDelegate(data)</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 通过代理，取代了Bird种类的继承体系</span><br><span class="line"></span><br><span class="line">class Bird(private val speciesDelegate: SpeciesDelegate):IBirdSpecies &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun getPlumage(): String = speciesDelegate.getPlumage()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun getAirSpeedVelocity(): Int = speciesDelegate.getAirSpeedVelocity()</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 通过接口表达不同species bird的区别</span><br><span class="line"></span><br><span class="line">interface IBirdSpecies &#123;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    fun getPlumage(): String</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    fun getAirSpeedVelocity(): Int</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 添加基类，抽象子类的公共行为</span><br><span class="line"></span><br><span class="line">open class SpeciesDelegate(protected val data: BirdProperty): IBirdSpecies &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun getPlumage(): String = &quot;average&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun getAirSpeedVelocity(): Int = -1</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class EuropeanSwallowDelegate(data: BirdProperty) : SpeciesDelegate(data) &#123;</span><br><span class="line"></span><br><span class="line">    override fun getAirSpeedVelocity(): Int &#123;</span><br><span class="line"></span><br><span class="line">        return 35</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class AfricanSwallowDelegate(data: BirdProperty) : SpeciesDelegate(data) &#123;</span><br><span class="line"></span><br><span class="line">    override fun getAirSpeedVelocity(): Int &#123;</span><br><span class="line"></span><br><span class="line">        return 40 - 2 * data.numberOfCoconuts;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class NorwegianBlueParrotDelegate(data: BirdProperty) : SpeciesDelegate(data) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun getPlumage(): String &#123;</span><br><span class="line"></span><br><span class="line">        return if (data.voltage &gt; 100) &#123;</span><br><span class="line"></span><br><span class="line">            &quot;scorched&quot;</span><br><span class="line"></span><br><span class="line">        &#125; else &#123;</span><br><span class="line"></span><br><span class="line">            &quot;beautiful&quot;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    override fun getAirSpeedVelocity(): Int &#123;</span><br><span class="line"></span><br><span class="line">        return if (data.isNailed)</span><br><span class="line"></span><br><span class="line">            0</span><br><span class="line"></span><br><span class="line">        else 10 + data.voltage / 10</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个例子的几点改动说明：</p>
+<ol>
+<li>通过代理，取代了Bird种类的继承体系，这样Bird就重获被继承的能力</li>
+<li>三个Delegate分别替换了几个Bird子类，通过SpeciesDelegate完全托管了species这套继承体系，整体逻辑更内聚。后续如果添加新的bird spices，也只用修改SpeciesDelegate，不会改动到Bird。</li>
+<li>添加接口IBirdSpecies，表达不同种类的鸟的具体区别</li>
+<li>提炼子类的公共行为，添加基类SpeciesDelegate</li>
+<li>同样，鸟类的生存属性（Wild、Captive）也可以用这个思维进行代理，Bird就可以通过组合两套Delegate体系表达更丰富的功能</li>
+</ol>
+<p>通过这个例子，想分享两个观点：</p>
+<ol>
+<li>可以看到该例并没有完全舍弃继承，而是利用代理+继承，替代了初始的继承结构。所以“委托取代继承”是一个相对概念，很多事情不是非0即1。</li>
+<li>另一个观点是，什么时候使用继承，什么时候使用代理取代继承，需要看业务形态。当业务逻辑没那么复杂时，两者的差别并不明显，同时继承逻辑容易被理解，所以一开始写代码使用继承结构并无大碍。但当继承结构要处理不同体系的行为时，就该使用代理重构代码了。</li>
+</ol>
+<h1 id="优化封装结构"><a href="#优化封装结构" class="headerlink" title="优化封装结构"></a>优化封装结构</h1><h3 id="以查询取代临时变量-Replace-Temp-with-Query"><a href="#以查询取代临时变量-Replace-Temp-with-Query" class="headerlink" title="以查询取代临时变量 Replace Temp with Query"></a>以查询取代临时变量 Replace Temp with Query</h3><p>使用临时变量可以避免在一个方法中对一段逻辑重复计算。如果对这段逻辑提炼，改用查询函数，可以避免同一段逻辑在多个方法中重复计算。</p>
+<p>下面这个例子，计算basePrice的代码在类中的多个方法都出现（代码进行了简化），那这段逻辑就应该提炼到方法，以查询取代临时变量。</p>
+<p>将临时变量的计算逻辑放到函数，也有助于在提炼得到的函数与原函数之间设立清晰的边界，这能帮我们发现并避免难缠的依赖及副作用。</p>
+<p>原例：使用两个临时变量basePrice和discountFactor计算实际的price</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class Order(val quantity, val item) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    fun getPrice() &#123;</span><br><span class="line"></span><br><span class="line">        var basePrice = this.quantity * this.item.price;</span><br><span class="line"></span><br><span class="line">        var discountFactor = 0.98;</span><br><span class="line"></span><br><span class="line">        if (basePrice &gt; 1000) discountFactor -= 0.03;</span><br><span class="line"></span><br><span class="line">        return basePrice * discountFactor;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运用以查询取代临时变量，把这两个临时变量提炼到函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">class Order(val quantity, val item) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    fun getPrice() &#123;</span><br><span class="line"></span><br><span class="line">        return getBasePrice() * getDiscountFactor();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    private fun getBasePrice() = this.quantity * this.item.price</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    private fun getDiscountFactor() &#123;</span><br><span class="line"></span><br><span class="line">        val discountFactor = 0.98</span><br><span class="line"></span><br><span class="line">        return if (getBasePrice() &gt; 1000) &#123;</span><br><span class="line"></span><br><span class="line">            discountFactor -= 0.03;</span><br><span class="line"></span><br><span class="line">        &#125; else &#123;</span><br><span class="line"></span><br><span class="line">            discountFactor</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="隐藏委托关系和移除中间人-Hide-Delegate-and-Remove-Middle-Man"><a href="#隐藏委托关系和移除中间人-Hide-Delegate-and-Remove-Middle-Man" class="headerlink" title="隐藏委托关系和移除中间人 Hide Delegate and Remove Middle Man"></a>隐藏委托关系和移除中间人 Hide Delegate and Remove Middle Man</h3><p>隐藏委托关系(Hide Delegate)和移除中间人(Remove Middle Man)是两个相反的重构思路。</p>
+<p>比如我们想得到某个省下面某个市的区号，可以用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">val areaCode = provice().city().areaCode()</span><br></pre></td></tr></table></figure>
+<p>这种写法出现了较长的消息链，如果不了解City的内部结构，是不知道如何得到areaCode。</p>
+<p>像这个例子，先通过一个对象A得到另一个对象B，再利用另一个对象B获取结果，那使用方不仅要知道A的细节，还要知道B的细节才能正常工作。而封装的目的是为了让使用方尽可能少的了解其他系统部分的的细节信息。</p>
+<p>隐藏委托关系，就是把获取B的结果封装到A内部，这个例子就可以改成：provice().areaCode()</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">class Province &#123;</span><br><span class="line"></span><br><span class="line">    fun areaCode() = city().areaCode()</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样做的好处，一个是不需要让调用方有较多上下文包袱就能正常使用服务，另一个是后续areaCode的内部实现如果发生变化，不会污染到调用方。</p>
+<p>但是，使用“隐藏委托关系”有个代价，会让A对象成为B的“中间人”。我们想知道B的能力，都必须先经过A。这样A的维护成本就比较高。而“移除中间人”就是把B直接交给服务方，避免过度中转，即provice().city().areaCode()。</p>
+<p>所以，哪种情况使用隐藏委托关系，哪种情况使用移除中间人，很难说这个度是什么。《重构》一书中有较多反向的重构思路，比如提炼类和内联类、分解条件表达式和合并条件表达式、函数上移和函数下移等。具体原则的实践，多考虑开发效率、代码稳健性、团队理念，具体情况具体对待。</p>
+<h1 id="过胖的类“减肥”"><a href="#过胖的类“减肥”" class="headerlink" title="过胖的类“减肥”"></a>过胖的类“减肥”</h1><p>类或方法过于庞大，比如一个方法五百行，一个类五千行，对于维护者和阅读者都不友好，前者不敢改，后者读的累。业务复杂后，这种情况还比较常见，代码加着加着，类就变的庞大了。面对这种情况，可以通过静态代码检查规则，设置“庞大”警戒线。比如方法或类超过多少行，就要提醒可以重构了。给类或方法减肥有很多方式，比如：</p>
+<h3 id="提炼类-Extract-Class"><a href="#提炼类-Extract-Class" class="headerlink" title="提炼类 Extract Class"></a>提炼类 Extract Class</h3><p>当类中有几个彼此关联的概念，或者是几个变量有相同的前缀，那么可以考虑把这几个变量连带相关方法提炼到独立的类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">class Person &#123;</span><br><span class="line"></span><br><span class="line">    fun getOfficeAreaCode() = this._officeAreaCode</span><br><span class="line"></span><br><span class="line">    fun getOfficeNumber() = this._officeNumber</span><br><span class="line"></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>区号、电话号码和Persong的常规理解不是特别紧密，可以把区号、电话号码提炼到单独的类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class Person &#123;</span><br><span class="line"></span><br><span class="line">    fun getOfficeAreaCode() = this.telephoneNumber.officeAreaCode</span><br><span class="line"></span><br><span class="line">    fun getOfficeNumber() = this.telephoneNumber.officeNumber</span><br><span class="line"></span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">class TelephoneNumber &#123;</span><br><span class="line"></span><br><span class="line">    fun getAreaCode() = this.areaCode</span><br><span class="line"></span><br><span class="line">    fun getNumber() = this.number</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="善用组合"><a href="#善用组合" class="headerlink" title="善用组合"></a>善用组合</h3><p>通过组合，把特定功能代理出去，抽象成服务，然后以组合形式为业务类提供调用。</p>
+<p>MVVM架构中，ViewModel可能要代理Api请求，处理数据中转、异常处理、业务埋点上报、性能监控等等。把这么多功能都放到ViewModel，这个类慢慢就会“变胖”。如果ViewModel还有继承体系，不同的子ViewModel需要定制监控、埋点等，那复杂度就更高了。一个解决思路是，把埋点、监控、异常处理等业务常规能力单独提炼成类，比如埋点服务、监控服务、异常处理服务，然后以组合的形式供ViewModel使用(即代理)。在提炼这些服务时，尽可能的抽象，减少耦合才能提高模块复用性。</p>
+<h3 id="以多态取代条件表达式，下放逻辑分支"><a href="#以多态取代条件表达式，下放逻辑分支" class="headerlink" title="以多态取代条件表达式，下放逻辑分支"></a>以多态取代条件表达式，下放逻辑分支</h3><p>一个庞大的类，往往有很多条件分支，对于不同情况做着不同的逻辑处理。这种情况下，参考<a href="https://bytedance.feishu.cn/docs/doccnQMHSRy0fEaEylBqn0l9ZVg#7LZfzi" target="_blank" rel="noopener">《以多态取代条件表达式》</a>，原本在Adapter中的条件分支和每个分支的View创建及刷新工作，以多态形式替代，Adapter分支的处理下方给各个View子类，同时把View的创建迁移到工厂类，让Adapter的逻辑更清晰。</p>
+<p>我们项目的开发语言从Java完全切换到Kotlin，下面介绍几个可以让代码更优雅的Kotlin特性。</p>
+<h1 id="善用Extension-Kotlin"><a href="#善用Extension-Kotlin" class="headerlink" title="善用Extension [Kotlin]"></a>善用Extension [Kotlin]</h1><p>Kotlin 能够扩展一个类的新功能而无需继承该类或者使用像装饰者这样的设计模式。通过两个例子感受下Extension的趣味。</p>
+<h3 id="三目运算符"><a href="#三目运算符" class="headerlink" title="三目运算符"></a>三目运算符</h3><p>之前使用Java，对于简短的if-else判断，我更喜欢用三目运算符<code>?:</code>，但Kotlin没有这个特性。像下面这个case，就要写成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">val bloodVolume = if (today is weekend) &#123;</span><br><span class="line"></span><br><span class="line">    xxx()</span><br><span class="line"></span><br><span class="line">&#125; else &#123;</span><br><span class="line"></span><br><span class="line">    yyy()</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>习惯是很难改变的，如果是好的习惯，干嘛要改变呢。上面的case希望使用一行代码解决：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">val bloodVolume = ternary(today is weekend, &#123; xxx() &#125;, &#123; yyy() &#125;)</span><br></pre></td></tr></table></figure>
+<p>ternary extension示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">inline fun &lt;T&gt; ternary(condition: Boolean, trueAction: () -&gt; T, falseAction: ()-&gt; T ): T =</span><br><span class="line"></span><br><span class="line">    if (condition) &#123;</span><br><span class="line"></span><br><span class="line">        trueAction()</span><br><span class="line"></span><br><span class="line">    &#125; else &#123;</span><br><span class="line"></span><br><span class="line">        falseAction()</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>注意，为了性能考虑，记得加inline。</p>
+<h3 id="可空变量的let优化"><a href="#可空变量的let优化" class="headerlink" title="可空变量的let优化"></a>可空变量的let优化</h3><p>像下面这个case，两个Nullable变量作为方法入参，但方法参数要求NonNull，需要写成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">val result = param1?.let &#123; p1 -&gt;</span><br><span class="line"></span><br><span class="line">                param2?.let &#123; p2 -&gt;</span><br><span class="line"></span><br><span class="line">                    action(p1, p2)</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+<p>这个写法有点丑陋，真正的执行逻辑就一行代码调用，但5行代码中有4行是为了判空。试想下，如果方法入参从2个扩充到3个、4个…</p>
+<p>简化写法示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">val result = Pair(param1, param2).biLet &#123; p1, p2 -&gt; </span><br><span class="line"></span><br><span class="line">    action(p1, p2) </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过对Pair的扩展，收敛let的判空逻辑。方法参数越多时，这个extension的简洁优势会更明显，比如tripleLet、quadrupleLet。</p>
+<p>biLet extension代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">inline fun &lt;T, U, R&gt; Pair&lt;T?, U?&gt;.biLet(block: (T, U) -&gt; R?): R? &#123;</span><br><span class="line"></span><br><span class="line">    return first?.let &#123; f -&gt;</span><br><span class="line"></span><br><span class="line">        second?.let &#123; s -&gt;</span><br><span class="line"></span><br><span class="line">             block(f, s)</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>更多关于Kotlin Extension的内容可以参考官网 <a href="https://www.kotlincn.net/docs/reference/extensions.html" target="_blank" rel="noopener">&gt;&gt;</a>。</p>
+<h1 id="Collection-Pipeline-Kotlin"><a href="#Collection-Pipeline-Kotlin" class="headerlink" title="Collection Pipeline [Kotlin]"></a>Collection Pipeline [Kotlin]</h1><p>《重构》的作者建议“Replace Loop with Pipeline”，pipeline就是集合自带的操作方法，比如filter、map、first、take等。通过pipeline api可以减少重复、丑陋的collection for loop操作。</p>
+<h3 id="filter-amp-map"><a href="#filter-amp-map" class="headerlink" title="filter &amp; map"></a>filter &amp; map</h3><p>这两个api用的比较多，过滤出(filter)集合中符合条件的元素，并把元素中我们想要的内容提取出来(map)。</p>
+<p>示例：专辑列表中，提取Taylor的专辑的名称</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">val taylorAlbumNames = ArrayList&lt;String&gt;()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// loop用法</span><br><span class="line"></span><br><span class="line">albums.forEach &#123;</span><br><span class="line"></span><br><span class="line">    if (it is TaylorAlbum) &#123;</span><br><span class="line"></span><br><span class="line">        taylorAlbumNames.add(it.name)</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// pipeline用法</span><br><span class="line"></span><br><span class="line">taylorAlbumNames.addAll(albums.filter &#123; it is TaylorAlbum &#125;.map &#123; it.name &#125;)</span><br></pre></td></tr></table></figure>
+<p><code>filter { it is Album }</code>也可以使用<strong>filterIsInstance</strong>代替：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">taylorAlbumNames.addAll(albums.filterIsInstance&lt;Album&gt;().map &#123; it.name &#125;)</span><br></pre></td></tr></table></figure>
+<p>kotlin中允许可空，比如albums = ArrayList&lt;Albums?&gt;()。在对album查找元素时，可以用<strong>filterNotNull</strong>过滤出非空元素再二次操作。</p>
+<h3 id="first-amp-last"><a href="#first-amp-last" class="headerlink" title="first &amp; last"></a>first &amp; last</h3><p>查找第一个符合条件的元素，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">albums.first &#123; it.name.contains(&quot;Taylor&quot;) &#125;</span><br></pre></td></tr></table></figure>
+<p>当albums中没有符合条件的元素时，使用first会抛出NoSuchElementException异常。安全做法也可以使用firstOrNull，找不到元素时返回null，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">albums.firstOrNull &#123; it.name.contains(&quot;Taylor&quot;) &#125;</span><br></pre></td></tr></table></figure>
+<p>更多Collection Pipeline Api的使用参考官网 <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-collection/" target="_blank" rel="noopener">&gt;&gt;</a>。</p>
+<h1 id="关于命名"><a href="#关于命名" class="headerlink" title="关于命名"></a>关于命名</h1><p>好的命名能够让阅读者对代码见名知意。前面一些代码示例中，也可以看到适当的修改方法命名会提高代码的可读性。网上有很多关于不同语言的命名规范，建议大家读一读，比如：</p>
+<ul>
+<li>避免以个人主观理解对单词简写</li>
+<li>包的名称总是小写且不使用下划线</li>
+<li>类与对象的名称以大写字母开头并使用驼峰风格</li>
+<li>常量名称应该使用大写、下划线分隔的名称</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const val MAX_COUNT = 8</span><br><span class="line"></span><br><span class="line">val USER_NAME_FIELD = &quot;UserName&quot;</span><br></pre></td></tr></table></figure>
+<p>更多内容参考Kotlin编码规范 <a href="https://www.kotlincn.net/docs/reference/coding-conventions.html" target="_blank" rel="noopener">&gt;&gt;</a> 和 Kotlin 样式指南 <a href="https://developer.android.com/kotlin/style-guide?hl=zh-cn" target="_blank" rel="noopener">&gt;&gt;</a>。</p>
+<h1 id="关于注释"><a href="#关于注释" class="headerlink" title="关于注释"></a>关于注释</h1><p>代码无法轻松表达语义时，我们更希望通过注释来提高阅读效率。注释并不是越多越好，对命名规范、见名知意的代码加上注释，会显得累赘。但是逻辑复杂、背景深邃的代码，就值得加上注释。</p>
+<p>项目中我们鼓励同学们多加注释，因为起个好名字往往比加上注释要难。并且业务发展过快，代码逻辑很容易变得复杂。多加点注释，对于其他同学理解业务也是一个帮助。</p>
+<p>还有一种鼓励加注释的情况是希望提高搜索效率。比如引用三方SDK。在SDK声明时（所有SDK的声明和版本号放在统一文件，方便管理）注释官方文档链接或团队整理的master doc（包含SDK使用说明、错误码、版本变更记录等），这样比在浩瀚的文档库中寻宝更高效。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>就像《三少爷的剑》，燕十三鄙夷三少爷的剑招都是简单的杀招，“击刺格洗，抽带提点，崩压搅挫，撩圈斩抹”，但他就是打不过人家。招数没有高下，有高下之别的是执剑人。代码优化的理念就像三少爷的剑术，不需要硬套复杂的设计原则、重构理念。本文说明的很多重构理念都是比较简单常见的，但是能把常见的重构方法、语言特性灵活运用，代码自然就会优雅。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/23/APM开源方案Matrix —— ResourceCanary/" rel="next" title="APM开源方案Matrix —— ResourceCanary">
+                <i class="fa fa-chevron-left"></i> APM开源方案Matrix —— ResourceCanary
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">hningoba</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#收敛可变范围"><span class="nav-text">收敛可变范围</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#以查询取代派生变量-Replace-Derived-Variable-with-Query"><span class="nav-text">以查询取代派生变量 Replace Derived Variable with Query</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免修改方法入参"><span class="nav-text">避免修改方法入参</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#拆分变量-Split-Variable"><span class="nav-text">拆分变量 Split Variable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#函数组合成类-Combine-Functions-into-Class"><span class="nav-text">函数组合成类 Combine Functions into Class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分离查询函数和修改函数-Separate-Query-from-Modifier"><span class="nav-text">分离查询函数和修改函数 Separate Query from Modifier</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简化条件表达式"><span class="nav-text">简化条件表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#以多态取代条件表达式-Replace-Conditional-with-Polymorphism"><span class="nav-text">以多态取代条件表达式 Replace Conditional with Polymorphism</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#以卫语句取代嵌套条件表达式-Replace-Nested-Conditional-with-Guard-Clauses"><span class="nav-text">以卫语句取代嵌套条件表达式 Replace Nested Conditional with Guard Clauses</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引入特例-Introduce-Special-Case"><span class="nav-text">引入特例 Introduce Special Case</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引入断言-Introduce-Assertion"><span class="nav-text">引入断言 Introduce Assertion</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#处理继承关系"><span class="nav-text">处理继承关系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#移动成员，让继承职责更清晰"><span class="nav-text">移动成员，让继承职责更清晰</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#委托取代继承-Replace-Subclass-with-Delegate"><span class="nav-text">委托取代继承 Replace Subclass with Delegate</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#优化封装结构"><span class="nav-text">优化封装结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#以查询取代临时变量-Replace-Temp-with-Query"><span class="nav-text">以查询取代临时变量 Replace Temp with Query</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隐藏委托关系和移除中间人-Hide-Delegate-and-Remove-Middle-Man"><span class="nav-text">隐藏委托关系和移除中间人 Hide Delegate and Remove Middle Man</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#过胖的类“减肥”"><span class="nav-text">过胖的类“减肥”</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#提炼类-Extract-Class"><span class="nav-text">提炼类 Extract Class</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#善用组合"><span class="nav-text">善用组合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#以多态取代条件表达式，下放逻辑分支"><span class="nav-text">以多态取代条件表达式，下放逻辑分支</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#善用Extension-Kotlin"><span class="nav-text">善用Extension [Kotlin]</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#三目运算符"><span class="nav-text">三目运算符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可空变量的let优化"><span class="nav-text">可空变量的let优化</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Collection-Pipeline-Kotlin"><span class="nav-text">Collection Pipeline [Kotlin]</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#filter-amp-map"><span class="nav-text">filter &amp; map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#first-amp-last"><span class="nav-text">first &amp; last</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于命名"><span class="nav-text">关于命名</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于注释"><span class="nav-text">关于注释</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hningoba</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

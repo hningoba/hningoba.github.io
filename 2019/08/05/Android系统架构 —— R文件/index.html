@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Android通过AAPT(Android Asset Packing Tool)将各种资源集成打包并生成索引文件，即R文件。做模块化或编译优化相关工作时，需要对R文件有更多的了解，比如library module中的资源需要加resourcePrefix，做增量编译时可以只编译application module中的R文件等等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android系统架构 —— R文件">
+<meta property="og:url" content="https://hningoba.github.io/2019/08/05/Android系统架构 —— R文件/index.html">
+<meta property="og:site_name" content="自律使人自由">
+<meta property="og:description" content="Android通过AAPT(Android Asset Packing Tool)将各种资源集成打包并生成索引文件，即R文件。做模块化或编译优化相关工作时，需要对R文件有更多的了解，比如library module中的资源需要加resourcePrefix，做增量编译时可以只编译application module中的R文件等等。">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://hningoba.github.io/img/R文件结构_library.png">
+<meta property="og:image" content="https://hningoba.github.io/img/R文件结构_app.png">
+<meta property="og:updated_time" content="2021-09-21T07:01:22.111Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android系统架构 —— R文件">
+<meta name="twitter:description" content="Android通过AAPT(Android Asset Packing Tool)将各种资源集成打包并生成索引文件，即R文件。做模块化或编译优化相关工作时，需要对R文件有更多的了解，比如library module中的资源需要加resourcePrefix，做增量编译时可以只编译application module中的R文件等等。">
+<meta name="twitter:image" content="https://hningoba.github.io/img/R文件结构_library.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://hningoba.github.io/2019/08/05/Android系统架构 —— R文件/"/>
+
+
+
+
+
+  <title>Android系统架构 —— R文件 | 自律使人自由</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">自律使人自由</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2019/08/05/Android系统架构 —— R文件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hningoba">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律使人自由">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android系统架构 —— R文件</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-08-05T11:58:06+08:00">
+                2019-08-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Android通过AAPT(Android Asset Packing Tool)将各种资源集成打包并生成索引文件，即R文件。做模块化或编译优化相关工作时，需要对R文件有更多的了解，比如library module中的资源需要加resourcePrefix，做增量编译时可以只编译application module中的R文件等等。<br><a id="more"></a></p>
+<h3 id="application和library-module中R文件的区别"><a href="#application和library-module中R文件的区别" class="headerlink" title="application和library module中R文件的区别"></a>application和library module中R文件的区别</h3><p>结论：</p>
+<ul>
+<li>application module中的R文件的资源声明字段都是以<strong>常量</strong>形式存在，编译后使用到的资源字段以<strong>常量值</strong>的方式编译进class中。</li>
+<li>library module中的R文件的资源声明都是以<strong>变量</strong>形式存在，编译后使用到的字段会以<strong>代码引用方式</strong>编译进class中。</li>
+</ul>
+<p>​    </p>
+<p>举个例子：</p>
+<p>application module:</p>
+<p>在application module中新建MainActivity，布局文件是activity_main.xml。编译后，application module的R文件中可以看到：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public final class R &#123;</span><br><span class="line">	public static final class layout &#123;</span><br><span class="line">		public static final int activity_main=0x7f09001c;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>activity_main被final修饰，以常量形式存在。且编译后，这个field在class中的引用会被替换成常量值。</p>
+<p>MainActivity.class中R.layout.activity_main会被替换成常量值0x7f09001c，十进制为2131296284。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends AppCompatActivity &#123;</span><br><span class="line">	protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">		super.onCreate(savedInstanceState);</span><br><span class="line">		this.setContentView(2131296284);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>library module:</p>
+<p>在library module中新建SubModuleActivity，布局文件是activity_sub_module.xml。编译后，library module中的R文件是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public final class R &#123;</span><br><span class="line">	public static final class layout &#123;</span><br><span class="line">		public static int activity_sub_module = 0x7f0f001d;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>activity_sub_module没有被final修饰，以变量形式存在。</p>
+<p>编译后，SubModuleActivity.class中R.layout.activity_sub_module仍然以变量形式存在，以代码引用方式编译进class中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class SubModuleActivity extends AppCompatActivity &#123;</span><br><span class="line">    protected void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">        super.onCreate(savedInstanceState);</span><br><span class="line">        this.setContentView(layout.activity_sub_module);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>试想下，如果library module中的R文件的资源声明也是以常量形式声明的话，代码中的资源引用会被替换成常量值。library module和application module中如果出现同名资源，根据R文件合并规则，该资源最终会以application中的资源为准，这就导致library module中代码里资源的常量值对应不到资源，报Resource NotFoundException。</p>
+<h3 id="module中R文件个数"><a href="#module中R文件个数" class="headerlink" title="module中R文件个数"></a>module中R文件个数</h3><p>​        一个module被编译时，会生成一个当前module的R文件，同时，该module依赖的module或aar也会在当前module生成R文件。这种依赖关系也包括跨层的传递依赖。所以，一个module中R文件的个数 = 其依赖的module/aar数量 + 1(自身的R文件)。</p>
+<p>​        同理，application module中包含了整个app所有模块的R.java文件。</p>
+<p>举个例子：</p>
+<p>demo项目依赖结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- app (pkg: com.tools.demo)</span><br><span class="line"> - library (pkg: com.tools.second)</span><br><span class="line">  - third (pkg: com.tools.third)</span><br></pre></td></tr></table></figure>
+<p>其中library引用了fresco。</p>
+<p>编译后，library模块中不仅包含了自身的R文件(com.tools.second.R)，还包含了依赖的module(third模块)和依赖的aar(fresco)的R文件。</p>
+<p><img src="/img/R文件结构_library.png" style="zoom:30%"></p>
+<p>app模块则包含了整个app所有模块的R文件，包括直接依赖(library)和间接依赖(third, fresco)的所有module/aar的R文件。</p>
+<p><img src="/img/R文件结构_app.png" style="zoom:30%"></p>
+<h3 id="资源合并规则"><a href="#资源合并规则" class="headerlink" title="资源合并规则"></a>资源合并规则</h3><p>APK中的资源主要有3个来源：</p>
+<ul>
+<li>The main source set (generally located in  src/main/res/)</li>
+<li>Build variant source sets</li>
+<li>Android libraries (AARs)</li>
+</ul>
+<p>​        一个资源文件的文件名在resource type (anim/drawable/layout/menu..) 和 resource qualifier (比如drawable中的hdpi、value中的语言) 目录内是唯一的话，这个资源就被认为是唯一的。</p>
+<p>​        资源文件冲突时，按照下面的优先级进行合并，低优的资源会被覆盖。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">build variant &gt; build type &gt; product flavor &gt; main source set &gt; library dependencies</span><br></pre></td></tr></table></figure>
+<p>比如：main source set包含以下资源：</p>
+<ul>
+<li>res/layout/foo.xml</li>
+<li>res/layout-land/foo.xml</li>
+</ul>
+<p>debug build type包含：</p>
+<ul>
+<li>res/layout/foo.xml</li>
+</ul>
+<p>最终APK文件中的<code>res/layout/foo.xml</code>来自debug build type，<code>res/layout-land/foo.xml</code>来自main source set。</p>
+<h5 id="build-variant："><a href="#build-variant：" class="headerlink" title="build variant："></a>build variant：</h5><p>​    build variant可以认为是build type和product flavor的结合。Gradle 会根据build type和product flavor自动创建build variant，并按照 <code>&lt;product-flavor&gt;&lt;Build-Type&gt;</code> 的格式命名这些变体。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    ...</span><br><span class="line">    defaultConfig &#123;...&#125;</span><br><span class="line">    </span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        debug&#123;...&#125;</span><br><span class="line">        release&#123;...&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    productFlavors &#123;</span><br><span class="line">        internal &#123;...&#125;</span><br><span class="line">        googlePlay &#123;...&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>​    根据上述配置，gradle会构建以下build variant：</p>
+<ul>
+<li>internalDebug</li>
+<li>internalRelease</li>
+<li>googlePlayDebug</li>
+<li>googlePlayRelease</li>
+</ul>
+<h3 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><p><a href="https://developer.android.com/studio/write/add-resources.html#resource_merging" target="_blank" rel="noopener">Android Resource merging</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/29/OpenGL变量uniform、attribute和varying/" rel="next" title="OpenGL变量uniform、attribute和varying">
+                <i class="fa fa-chevron-left"></i> OpenGL变量uniform、attribute和varying
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/28/Android系统架构 —— Choreographer/" rel="prev" title="Android系统架构 —— Choreographer">
+                Android系统架构 —— Choreographer <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">hningoba</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#application和library-module中R文件的区别"><span class="nav-text">application和library module中R文件的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#module中R文件个数"><span class="nav-text">module中R文件个数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#资源合并规则"><span class="nav-text">资源合并规则</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#build-variant："><span class="nav-text">build variant：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考："><span class="nav-text">参考：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hningoba</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
