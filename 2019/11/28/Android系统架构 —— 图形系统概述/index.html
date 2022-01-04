@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="疑问 BufferQueue中的数据(GraphicBuffer)又是怎么传递给Layer的呢？ SurfaceFlinger是怎么合成所有Layer数据的？一次合成多少个Layer？ Surface和窗口 or Window 有什么关系？一个窗口会有多个图层，比如导航栏、content、底部栏等View，是一个窗口中所有View都投射到一个Surface中么？ Window和Activity、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android系统架构 —— 图形系统概述">
+<meta property="og:url" content="https://hningoba.github.io/2019/11/28/Android系统架构 —— 图形系统概述/index.html">
+<meta property="og:site_name" content="自律使人自由">
+<meta property="og:description" content="疑问 BufferQueue中的数据(GraphicBuffer)又是怎么传递给Layer的呢？ SurfaceFlinger是怎么合成所有Layer数据的？一次合成多少个Layer？ Surface和窗口 or Window 有什么关系？一个窗口会有多个图层，比如导航栏、content、底部栏等View，是一个窗口中所有View都投射到一个Surface中么？ Window和Activity、">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://hningoba.github.io/2019/11/28/Android系统架构%20——%20图形系统概述/image-20210921161419392.png">
+<meta property="og:image" content="https://source.android.com/devices/images/ape_fwk_all.png">
+<meta property="og:image" content="https://source.android.com/devices/graphics/images/graphics-pipeline.png">
+<meta property="og:updated_time" content="2021-10-03T04:27:10.299Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android系统架构 —— 图形系统概述">
+<meta name="twitter:description" content="疑问 BufferQueue中的数据(GraphicBuffer)又是怎么传递给Layer的呢？ SurfaceFlinger是怎么合成所有Layer数据的？一次合成多少个Layer？ Surface和窗口 or Window 有什么关系？一个窗口会有多个图层，比如导航栏、content、底部栏等View，是一个窗口中所有View都投射到一个Surface中么？ Window和Activity、">
+<meta name="twitter:image" content="https://hningoba.github.io/2019/11/28/Android系统架构%20——%20图形系统概述/image-20210921161419392.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://hningoba.github.io/2019/11/28/Android系统架构 —— 图形系统概述/"/>
+
+
+
+
+
+  <title>Android系统架构 —— 图形系统概述 | 自律使人自由</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">自律使人自由</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2019/11/28/Android系统架构 —— 图形系统概述/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="hningoba">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="自律使人自由">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android系统架构 —— 图形系统概述</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-28T15:23:47+08:00">
+                2019-11-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <a id="more"></a>
+<h3 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h3><ul>
+<li>BufferQueue中的数据(GraphicBuffer)又是怎么传递给Layer的呢？</li>
+<li>SurfaceFlinger是怎么合成所有Layer数据的？一次合成多少个Layer？</li>
+<li>Surface和窗口 or Window 有什么关系？一个窗口会有多个图层，比如导航栏、content、底部栏等View，是一个窗口中所有View都投射到一个Surface中么？</li>
+<li>Window和Activity、View是什么关系？</li>
+</ul>
+<p><img src="image-20210921161419392.png" alt="image-20210921161419392" style="zoom:40%;"></p>
+<h3 id="三种上屏方式"><a href="#三种上屏方式" class="headerlink" title="三种上屏方式"></a>三种上屏方式</h3><p>两种方式将图像绘制到屏幕上：</p>
+<ul>
+<li>Canvas</li>
+<li>OpenGL ES</li>
+<li>Vulkan</li>
+</ul>
+<p>软件、硬件加速区别？</p>
+<p>无论哪种方式，都是将图像渲染到Surface上。</p>
+<h5 id="Surface："><a href="#Surface：" class="headerlink" title="Surface："></a>Surface：</h5><p>Surface是一个窗口，例如一个Activity是一个Surface，一个Dialog也是一个Surface。Surface位于App进程，承载了窗口的图形数据，与SurfaceFlinger侧的Layer对应。</p>
+<h5 id="BufferQueue："><a href="#BufferQueue：" class="headerlink" title="BufferQueue："></a>BufferQueue：</h5><p>BufferQueue是Surface和Layer的纽带。</p>
+<p>Native层的Surface实现了ANativeWindow结构体，构造函数中持有一个IGraphicBufferProducer，用于和BufferQueue交互。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">类声明：</span><br><span class="line">class Surface</span><br><span class="line">    : public ANativeObjectBase&lt;ANativeWindow, Surface, RefBase&gt;</span><br><span class="line"></span><br><span class="line">构造函数：</span><br><span class="line">Surface::Surface(const sp&lt;IGraphicBufferProducer&gt;&amp; bufferProducer, bool controlledByApp)</span><br></pre></td></tr></table></figure>
+<p>上层图形数据渲染到Surface，然后Surface通过IGraphicBufferProducer把GraphicBuffer提交到BufferQueue，即图形数据实际是渲染到BufferQueue中的一个GraphicBuffer，让SurfaceFlinger执行后续的合成显示工作。</p>
+<p>显示？</p>
+<h5 id="HWC"><a href="#HWC" class="headerlink" title="HWC"></a>HWC</h5><p>Hardware Composer，硬件混合渲染器，显示子系统的硬件抽象实现。</p>
+<blockquote>
+<p>HAL：<br>Hardware Abstraction Layer，硬件抽象层。Android HAL是连接Android Framework和Kernel的重要桥梁，主要目的是向下屏蔽设备及其驱动的实现细节，向上为系统服务以及Framework提供统一的设备访问接口。参考Android系统框架：<a href="https://source.android.com/devices/architecture" target="_blank" rel="noopener">&gt;&gt;</a></p>
+<p><img src="https://source.android.com/devices/images/ape_fwk_all.png" alt=""></p>
+</blockquote>
+<h3 id="BufferQueue"><a href="#BufferQueue" class="headerlink" title="BufferQueue"></a>BufferQueue</h3><p>Android图形系统包含两对生产者、消费者模型，都是通过BufferQueue进行连接：</p>
+<ol>
+<li>Canvas和OpenGL ES生成图形数据，SurfaceFlinger消费数据；</li>
+<li>SurfaceFlinger合成所有Layer的图形数据，Display进行显示。</li>
+</ol>
+<h3 id="SurfaceFlinger"><a href="#SurfaceFlinger" class="headerlink" title="SurfaceFlinger"></a>SurfaceFlinger</h3><p>Surface代表App进程中的一个窗口，承载窗口的图形数据。SurfaceFlinger是系统进程中合成所有窗口(Layer)图形数据的系统服务，然后送显到屏幕。</p>
+<p>SurfaceFlinger既是上层应用的图形数据消费者，又是Display的生产者。起到承上启下的作用。</p>
+<p>官方架构图：</p>
+<p><img src="https://source.android.com/devices/graphics/images/graphics-pipeline.png" alt="img"></p>
+<h3 id="屏幕画面显示流程"><a href="#屏幕画面显示流程" class="headerlink" title="屏幕画面显示流程"></a>屏幕画面显示流程</h3><p>Android显示系统，一般包括CPU、GPU、Display三个硬解部分。其中：</p>
+<ul>
+<li>CPU：负责计算图形数据，并交给GPU</li>
+<li><p>GPU：对图形数据进行渲染，渲染好后放到buffer中（其中SurfaceFlinger负责buffer的合成）</p>
+</li>
+<li><p>Display：屏幕或显示器，把GPU中合成好的buffer数据显示到屏幕上</p>
+</li>
+</ul>
+<h5 id="CPU计算图形数据"><a href="#CPU计算图形数据" class="headerlink" title="CPU计算图形数据"></a>CPU计算图形数据</h5><p>CPU计算图形数据指的就是View树的绘制过程，也就是Activity对应视图树从根布局DecorView层层遍历View，分别执行measure、layout、draw过程。该流程生成纹理和多边形，并送到GPU。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">measure+layout+draw  -&gt;  polygons texture</span><br></pre></td></tr></table></figure>
+<h5 id="GPU合成图形数据"><a href="#GPU合成图形数据" class="headerlink" title="GPU合成图形数据"></a>GPU合成图形数据</h5><p>GPU将CPU生成的纹理、多边形进行栅格化以及合成。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">polygons texture -&gt; rasterization</span><br></pre></td></tr></table></figure>
+<p>OpenGL的绘制流程中好像也有栅格化？</p>
+<h5 id="Display显示图形数据"><a href="#Display显示图形数据" class="headerlink" title="Display显示图形数据"></a>Display显示图形数据</h5><p>常说的16ms屏幕刷新一次，其实就是系统硬件16ms发送一次时钟信号，即vsync信号，通知Display将最新合成的图形数据显示到屏幕上。</p>
+<h3 id="三缓冲"><a href="#三缓冲" class="headerlink" title="三缓冲"></a>三缓冲</h3><p>为了解决双缓冲带来的卡顿问题，Android黄油计划推出了三缓冲，CPU、GPU、SurfaceFlinger各占一个Buffer，并行处理图像。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://source.android.com/devices/graphics?hl=zh-cn" target="_blank" rel="noopener">Android官方文档-图形</a></li>
+<li><a href="https://bytedance.feishu.cn/wiki/wikcnc7Xr7wyeBMfBsboo5UGY5P#" target="_blank" rel="noopener">https://bytedance.feishu.cn/wiki/wikcnc7Xr7wyeBMfBsboo5UGY5P#</a></li>
+<li><p><a href="http://gityuan.com/android/#45-%E5%9B%BE%E5%BD%A2%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97" target="_blank" rel="noopener">http://gityuan.com/android/#45-%E5%9B%BE%E5%BD%A2%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97</a></p>
+</li>
+<li><p><a href="https://sharrychoo.github.io/blog/android-source/graphic-overview" target="_blank" rel="noopener">https://sharrychoo.github.io/blog/android-source/graphic-overview</a></p>
+</li>
+<li><a href="https://juejin.cn/post/6898525503960186887" target="_blank" rel="noopener">https://juejin.cn/post/6898525503960186887</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/05/Android系统架构 —— R文件/" rel="next" title="Android系统架构 —— R文件">
+                <i class="fa fa-chevron-left"></i> Android系统架构 —— R文件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/28/Android系统架构 —— Choreographer/" rel="prev" title="Android系统架构 —— Choreographer">
+                Android系统架构 —— Choreographer <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">hningoba</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#疑问"><span class="nav-text">疑问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三种上屏方式"><span class="nav-text">三种上屏方式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Surface："><span class="nav-text">Surface：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#BufferQueue："><span class="nav-text">BufferQueue：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HWC"><span class="nav-text">HWC</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BufferQueue"><span class="nav-text">BufferQueue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SurfaceFlinger"><span class="nav-text">SurfaceFlinger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#屏幕画面显示流程"><span class="nav-text">屏幕画面显示流程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#CPU计算图形数据"><span class="nav-text">CPU计算图形数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#GPU合成图形数据"><span class="nav-text">GPU合成图形数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Display显示图形数据"><span class="nav-text">Display显示图形数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三缓冲"><span class="nav-text">三缓冲</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文档"><span class="nav-text">参考文档</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hningoba</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

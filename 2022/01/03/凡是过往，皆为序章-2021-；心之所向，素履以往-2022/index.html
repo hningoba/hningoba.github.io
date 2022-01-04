@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。">
+<meta name="description" content="每一年似乎过得都很快，这里简单回顾2021，寄语2022。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SpringBoot Kotlin热部署采坑">
-<meta property="og:url" content="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/index.html">
+<meta property="og:title" content="凡是过往，皆为序章 (2021)；心之所向，素履以往 (2022)">
+<meta property="og:url" content="https://hningoba.github.io/2022/01/03/凡是过往，皆为序章-2021-；心之所向，素履以往-2022/index.html">
 <meta property="og:site_name" content="自律使人自由">
-<meta property="og:description" content="使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。">
+<meta property="og:description" content="每一年似乎过得都很快，这里简单回顾2021，寄语2022。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-03-16T09:35:15.243Z">
+<meta property="og:updated_time" content="2022-01-04T03:14:43.598Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="SpringBoot Kotlin热部署采坑">
-<meta name="twitter:description" content="使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。">
+<meta name="twitter:title" content="凡是过往，皆为序章 (2021)；心之所向，素履以往 (2022)">
+<meta name="twitter:description" content="每一年似乎过得都很快，这里简单回顾2021，寄语2022。">
 
 
 
@@ -119,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/"/>
+  <link rel="canonical" href="https://hningoba.github.io/2022/01/03/凡是过往，皆为序章-2021-；心之所向，素履以往-2022/"/>
 
 
 
 
 
-  <title>SpringBoot Kotlin热部署采坑 | 自律使人自由</title>
+  <title>凡是过往，皆为序章 (2021)；心之所向，素履以往 (2022) | 自律使人自由</title>
   
 
 
@@ -242,7 +242,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2022/01/03/凡是过往，皆为序章-2021-；心之所向，素履以往-2022/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="hningoba">
@@ -259,7 +259,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">SpringBoot Kotlin热部署采坑</h1>
+          <h1 class="post-title" itemprop="name headline">凡是过往，皆为序章 (2021)；心之所向，素履以往 (2022)</h1>
         
 
         <div class="post-meta">
@@ -271,8 +271,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-15T02:19:42+08:00">
-                2018-07-15
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-01-03T10:26:45+08:00">
+                2022-01-03
               </time>
             
 
@@ -294,8 +294,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/技术/" itemprop="url" rel="index">
-                    <span itemprop="name">技术</span>
+                  <a href="/categories/随想/" itemprop="url" rel="index">
+                    <span itemprop="name">随想</span>
                   </a>
                 </span>
 
@@ -331,31 +331,38 @@
       
 
       
-        <p>使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。<br><a id="more"></a></p>
-<h3 id="热部署原理"><a href="#热部署原理" class="headerlink" title="热部署原理"></a>热部署原理</h3><p>SpringBoot使用两个类加载器实现热部署(restart)。</p>
-<p>​    Base ClassLoader：加载不变的类，比如三方库jar</p>
-<p>​    Restart ClassLoader：用于加载开发过程中的类</p>
-<p>​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷启动”要快。</p>
-<p>​    如果这种启动方式还嫌不够快或是遇到了一些类加载问题，可以考虑使用例如JRebel等方法实现重新加载。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Restart vs Reload</span><br><span class="line"></span><br><span class="line">The restart technology provided by Spring Boot works by using two classloaders. Classes that do not change (for example, those from third-party jars) are loaded into a base classloader. Classes that you are actively developing are loaded into a restart classloader. When the application is restarted, the restart classloader is thrown away and a new one is created. This approach means that application restarts are typically much faster than “cold starts”, since the base classloader is already available and populated.</span><br><span class="line"></span><br><span class="line">If you find that restarts are not quick enough for your applications or you encounter classloading issues, you could consider reloading technologies such as JRebel from ZeroTurnaround. These work by rewriting classes as they are loaded to make them more amenable to reloading.</span><br></pre></td></tr></table></figure>
-<h3 id="热部署devtools不生效"><a href="#热部署devtools不生效" class="headerlink" title="热部署devtools不生效"></a>热部署devtools不生效</h3><p>​    开发过SpringBoot项目的小伙伴都知道使用devtools就能实现项目热部署，不需要每次改动都要重启项目。</p>
-<p>​    常规配置devtools比较简单，只需要在pom.xml文件中添加devtools依赖即可(maven构建方式)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;</span><br><span class="line">	&lt;optional&gt;true&lt;/optional&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-<p>​    但是，如果项目使用Kotlin作为开发语言，只添加了上述配置并不能生效，即便修改文件后控制台也显示热部署。要想生效，还需要在IDE(Intellj)加上如下两个配置：</p>
-<h5 id="1-Enable-Automake-from-the-compiler"><a href="#1-Enable-Automake-from-the-compiler" class="headerlink" title="1 - Enable Automake from the compiler"></a>1 - Enable Automake from the compiler</h5><ul>
-<li>Press: ctrl + shift + A (For Mac ⌘ + shift + A)</li>
-<li>Type: <code>make project automatically</code></li>
-<li>Hit: Enter</li>
-<li>Enable <code>Make Project automatically</code> feature</li>
+        <p>每一年似乎过得都很快，这里简单回顾2021，寄语2022。</p>
+<a id="more"></a>
+<p>生活：最开心的莫过于年中搬进自己的房子。从去年看房、凑钱、选材、装修都是两个人忙前忙后，住进来后幸福指数提升明显，对这座城市也有了更多归属感。上海房价应验了周期性调整的规律，上半年涨的离谱。面对市场压力，被动推出“三价取最低”等新政，对刚需不太友好。还没买房的刚需不要被复杂因素干扰，可以尽快着手，找朋友了解相关金融方法，此处灰色不多展开。落户政策相比前几年宽松，提高城市竞争力，吸纳人才是必要条件。地铁线路在规划、落地方面做的还不错，家旁边的15号线也开通了。高架、内环的外牌限制更严，这让车牌资源更加抢手，也繁荣了车牌代拍这个行业（赚钱门路真的多，门槛也不算高）。面临双减政策，教育行业、学区房政策自然会受到影响，不只是上海。</p>
+<p><br></p>
+<p>读书与锻炼：今年读了一些书，但整体量不多，比较惭愧。读过的书中，重点推荐《高效能人士的七个习惯》，思维方式、自我引导、对外协作上，有很大帮助。有个周末花了一整天看完理查德伊文思写的《邓小平传》，这本书观点相对中立，推荐去了解下伟人之所以伟大的原因，对缓解压力也有意想不到的效果（普通人遇到的困难最多影响自己或身边若干人，很多是短期问题，与伟人遇到的困难相比都不算什么）。想对音乐这个行业有更多了解，可以看看《死里逃生：音乐产业崛起的内幕》，版权垄断之痛，以及对中腰部音乐人有了更多共鸣，也希望字节音乐最终做的不只是商业。通用技术方面，《重构》这本书每次读都有不同的理解和感受，还没读过的同学强烈建议读一读。</p>
+<p>锻炼就马马虎虎了，下半年比较懒，健身房打卡总量虽然已经200多次，力量有增加，但维度几乎没变化。周末多了羽毛球活动，不定期和几个朋友碰碰面。不清楚其他同学锻炼后的感受如何，自身体验下来，锻炼会降低自己对睡眠的依赖，对工作提效。还有个好处是，健身房也可以交交朋友，对团队内推有帮助，有个在途的候选人，就是健身房认识的公司同事推荐的。</p>
+<p><br></p>
+<p>团队：梯队方面，2021上半年，团队做了一次局部结构调整。调整过后，团队年轻化问题非常突出。经历下半年内推和团队招聘的努力，该问题得到缓解。随着团队梯度的健康化，可以直接感受到 理念对齐、团队协作、技术氛围搭建、核心业务交付、复杂技术专项攻坚 几方面都在好转。团队成长与业务发展，很多情况是相似的，需要韧性和坚持。只要坚持做正确的事情，路才会越来越宽。</p>
+<p>招聘方面，未来一年，业务压力仍会比较大 (可参考产研比数据)。除了内部加强培养外，外部招聘也需要更多投入，毕竟人手多才能支撑业务快速跑。为了保证团队整体水平、成员与团队的信任度，招聘门槛不能松。降低门槛短期看能解决简单的业务支撑，但长期看团队受损 (这一点比较考验技术leader的定力)。遇到特殊情况，理性处理，很多场景感性会误事。字节招聘理念 (招平均线以上的人的) 还是非常务实真切的。</p>
+<p>培养方面，理念对齐这一点曾被指出不够直接，这点确实需要反思。之前会顾虑同学的信任度和满意度，沟通的比较委婉。但长期看，更清晰、直接指出改进点，对对方也是一件好事。同学们快速成长，团队也是受益方。</p>
+<p><br></p>
+<p>技术与业务：最近一两年项目发展不错，各团队韧性比较足，也都抱有良好的学习和探索心态，业务方面几件事情做的还不错 (偏主观)，比如UG、留存专项、协同、商业化。端侧技术团队作为业务和用户之间重要的纽带 (战略布局、平台业务、内容产品、交互设计都需要通过C端App交付给用户)，除了支持业务快速迭代，还要保证良好的用户侧体验。今年一年在基础体验 (音频流畅度、冷启等)、稳定性治理、基建拿到一些收益。下半年业务压力较大，整体投入资源不多，后续在技术侧关键项目上需要更加果断和坚持。</p>
+<p>自己下场做过 音频流畅度优化 (预加载、码率、水位、编码等)、组件化 (模块化、分仓)、稳定性治理，整体感受是不能离一线太远，只有挤时间多做做，才更有判断力、给同学们更多输入。未来一年：</p>
+<ul>
+<li>需要更多思考和判断，走出去和其他团队交流交流；</li>
+<li>定期给团队诊诊脉搏，团队当前缺什么、哪里做的不足、哪里投入冗余？该大力投入就积极争取资源，不该投入就果断止损；</li>
+<li>更多了解行业、业务以及用户侧诉求；</li>
 </ul>
-<h5 id="2-Enable-Automake-when-the-application-is-running"><a href="#2-Enable-Automake-when-the-application-is-running" class="headerlink" title="2 - Enable Automake when the application is running"></a>2 - Enable Automake when the application is running</h5><ul>
-<li>Press: ctrl + shift + A (For Mac ⌘ + shift + A)</li>
-<li>Type: <code>Registry</code></li>
-<li>Find the key <code>compiler.automake.allow.when.app.running</code> and <strong>enable it</strong> or <strong>click the checkbox</strong> next to it</li>
+<p>这里点赞音乐各个技术团队交叉评审半年技术规划这件事，只有不断引导核心同学思考、提高认知，才能带领整个团队快速提高。</p>
+<p><br></p>
+<p>理念与认知：一个leader的认知水平决定团队的上限。程序员转型做技术leader，很多思维方式需要转变。比如：</p>
+<ul>
+<li>认清个人与团队是互相成就的关系，追求个人成长的目的应该是让自己站的更高，从而把团队带的更好；</li>
+<li>不要“过于”追求自身coding能力的成长，如果心里只有代码，那团队、业务得到的关注就会变少，从大的角度来说未必是件好事；</li>
+<li>长远看，沟通协作、业务理解、技术视野、复杂问题的判断力、团队规划 越来越重要；</li>
+<li>不定期对团队做复盘，当变化来临时不至于手忙脚乱，比如团队人员梯度 (缺哪方面的同学，方便储备人才应对未来业务变化)、工程架构与质量 (核心业务交付是否正常，项目质量和迭代效率是否在变好)、团队文化 (团队满意度非常重要，团队需要UG 即招聘，更需要考虑留存，流失一位老同学比加入新同学对团队影响大得多)</li>
 </ul>
-<p>重启项目即可。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-devtools.html" target="_blank" rel="noopener">Developer Tools</a></p>
-<p><a href="https://stackoverflow.com/questions/12744303/intellij-idea-java-classes-not-auto-compiling-on-save" target="_blank" rel="noopener">Intellij IDEA Java classes not auto compiling on save</a></p>
+<p>认知提升的方式很多，读书、复盘都不错。“向上链接”也是一个好的方式。这里说的向上是指自己走出去，找某一方面比自己强的人，多聊多学习。日常做事，要求自己至少站在leader+1的层次考虑问题，很多看似不好解的问题会变得没那么难。</p>
+<p><br></p>
+<p>压力管理：这里没有太多好说的，社会运转很快，每个人都有比较大的压力，每个人也都有很多短期目标需要达成。压力管理重要的是心态。心态放平和，凡事看的远一些。追求短期的同时，要时不时抬头看看远方。</p>
+<p><br></p>
+<p>未来的2022年，仍有很多事情要做。看书、锻炼是老生常谈的话题，重复立flag意义也不大。对自己的要求是，更加自律、更加平和。</p>
 
       
     </div>
@@ -380,8 +387,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/07/15/Android源码 —— NestedScrolling/" rel="next" title="Android源码 —— NestedScrolling">
-                <i class="fa fa-chevron-left"></i> Android源码 —— NestedScrolling
+              <a href="/2021/08/01/通用技术 —— 怎样写出优雅的代码/" rel="next" title="通用技术 —— 怎样写出优雅的代码">
+                <i class="fa fa-chevron-left"></i> 通用技术 —— 怎样写出优雅的代码
               </a>
             
           </div>
@@ -389,10 +396,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/08/12/通用技术 —— 依赖注入和控制反转/" rel="prev" title="通用技术 —— 依赖注入和控制反转">
-                通用技术 —— 依赖注入和控制反转 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -444,17 +447,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -514,22 +508,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#热部署原理"><span class="nav-text">热部署原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#热部署devtools不生效"><span class="nav-text">热部署devtools不生效</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-Enable-Automake-from-the-compiler"><span class="nav-text">1 - Enable Automake from the compiler</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-Enable-Automake-when-the-application-is-running"><span class="nav-text">2 - Enable Automake when the application is running</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
