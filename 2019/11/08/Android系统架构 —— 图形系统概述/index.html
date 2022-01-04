@@ -79,17 +79,21 @@
 
 
 
-<meta name="description" content="使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。">
+<meta name="description" content="补充中">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SpringBoot Kotlin热部署采坑">
-<meta property="og:url" content="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/index.html">
+<meta property="og:title" content="Android系统架构 —— 图形系统概述">
+<meta property="og:url" content="https://hningoba.github.io/2019/11/08/Android系统架构 —— 图形系统概述/index.html">
 <meta property="og:site_name" content="自律使人自由">
-<meta property="og:description" content="使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。">
+<meta property="og:description" content="补充中">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-03-16T09:35:15.243Z">
+<meta property="og:image" content="https://hningoba.github.io/2019/11/08/Android系统架构%20——%20图形系统概述/image-20210921161419392.png">
+<meta property="og:image" content="https://source.android.com/devices/images/ape_fwk_all.png">
+<meta property="og:image" content="https://source.android.com/devices/graphics/images/graphics-pipeline.png">
+<meta property="og:updated_time" content="2022-01-04T06:08:43.306Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="SpringBoot Kotlin热部署采坑">
-<meta name="twitter:description" content="使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。">
+<meta name="twitter:title" content="Android系统架构 —— 图形系统概述">
+<meta name="twitter:description" content="补充中">
+<meta name="twitter:image" content="https://hningoba.github.io/2019/11/08/Android系统架构%20——%20图形系统概述/image-20210921161419392.png">
 
 
 
@@ -119,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/"/>
+  <link rel="canonical" href="https://hningoba.github.io/2019/11/08/Android系统架构 —— 图形系统概述/"/>
 
 
 
 
 
-  <title>SpringBoot Kotlin热部署采坑 | 自律使人自由</title>
+  <title>Android系统架构 —— 图形系统概述 | 自律使人自由</title>
   
 
 
@@ -242,7 +246,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2018/07/15/SpringBoot Kotlin热部署采坑/">
+    <link itemprop="mainEntityOfPage" href="https://hningoba.github.io/2019/11/08/Android系统架构 —— 图形系统概述/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="hningoba">
@@ -259,7 +263,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">SpringBoot Kotlin热部署采坑</h1>
+          <h1 class="post-title" itemprop="name headline">Android系统架构 —— 图形系统概述</h1>
         
 
         <div class="post-meta">
@@ -271,8 +275,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-15T02:19:42+08:00">
-                2018-07-15
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-08T14:07:12+08:00">
+                2019-11-08
               </time>
             
 
@@ -331,31 +335,67 @@
       
 
       
-        <p>使用Kotlin写SpringBoot时遇到了一些小坑，在这里分享下。<br><a id="more"></a></p>
-<h3 id="热部署原理"><a href="#热部署原理" class="headerlink" title="热部署原理"></a>热部署原理</h3><p>SpringBoot使用两个类加载器实现热部署(restart)。</p>
-<p>​    Base ClassLoader：加载不变的类，比如三方库jar</p>
-<p>​    Restart ClassLoader：用于加载开发过程中的类</p>
-<p>​    当应用重启时，restart classloader就会被丢弃，重新创建一个。因为base classloader中的类不需要重新编译加载，所以这种启动方式比”冷启动”要快。</p>
-<p>​    如果这种启动方式还嫌不够快或是遇到了一些类加载问题，可以考虑使用例如JRebel等方法实现重新加载。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Restart vs Reload</span><br><span class="line"></span><br><span class="line">The restart technology provided by Spring Boot works by using two classloaders. Classes that do not change (for example, those from third-party jars) are loaded into a base classloader. Classes that you are actively developing are loaded into a restart classloader. When the application is restarted, the restart classloader is thrown away and a new one is created. This approach means that application restarts are typically much faster than “cold starts”, since the base classloader is already available and populated.</span><br><span class="line"></span><br><span class="line">If you find that restarts are not quick enough for your applications or you encounter classloading issues, you could consider reloading technologies such as JRebel from ZeroTurnaround. These work by rewriting classes as they are loaded to make them more amenable to reloading.</span><br></pre></td></tr></table></figure>
-<h3 id="热部署devtools不生效"><a href="#热部署devtools不生效" class="headerlink" title="热部署devtools不生效"></a>热部署devtools不生效</h3><p>​    开发过SpringBoot项目的小伙伴都知道使用devtools就能实现项目热部署，不需要每次改动都要重启项目。</p>
-<p>​    常规配置devtools比较简单，只需要在pom.xml文件中添加devtools依赖即可(maven构建方式)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;</span><br><span class="line">	&lt;optional&gt;true&lt;/optional&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-<p>​    但是，如果项目使用Kotlin作为开发语言，只添加了上述配置并不能生效，即便修改文件后控制台也显示热部署。要想生效，还需要在IDE(Intellj)加上如下两个配置：</p>
-<h5 id="1-Enable-Automake-from-the-compiler"><a href="#1-Enable-Automake-from-the-compiler" class="headerlink" title="1 - Enable Automake from the compiler"></a>1 - Enable Automake from the compiler</h5><ul>
-<li>Press: ctrl + shift + A (For Mac ⌘ + shift + A)</li>
-<li>Type: <code>make project automatically</code></li>
-<li>Hit: Enter</li>
-<li>Enable <code>Make Project automatically</code> feature</li>
+        <p>补充中</p>
+<a id="more"></a>
+<h3 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h3><ul>
+<li>BufferQueue中的数据(GraphicBuffer)又是怎么传递给Layer的呢？</li>
+<li>SurfaceFlinger是怎么合成所有Layer数据的？一次合成多少个Layer？</li>
+<li>Surface和窗口 or Window 有什么关系？一个窗口会有多个图层，比如导航栏、content、底部栏等View，是一个窗口中所有View都投射到一个Surface中么？</li>
+<li>Window和Activity、View是什么关系？</li>
 </ul>
-<h5 id="2-Enable-Automake-when-the-application-is-running"><a href="#2-Enable-Automake-when-the-application-is-running" class="headerlink" title="2 - Enable Automake when the application is running"></a>2 - Enable Automake when the application is running</h5><ul>
-<li>Press: ctrl + shift + A (For Mac ⌘ + shift + A)</li>
-<li>Type: <code>Registry</code></li>
-<li>Find the key <code>compiler.automake.allow.when.app.running</code> and <strong>enable it</strong> or <strong>click the checkbox</strong> next to it</li>
+<p><img src="image-20210921161419392.png" alt="image-20210921161419392" style="zoom:40%;"></p>
+<h3 id="三种上屏方式"><a href="#三种上屏方式" class="headerlink" title="三种上屏方式"></a>三种上屏方式</h3><p>两种方式将图像绘制到屏幕上：</p>
+<ul>
+<li>Canvas</li>
+<li>OpenGL ES</li>
+<li>Vulkan</li>
 </ul>
-<p>重启项目即可。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a href="https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-devtools.html" target="_blank" rel="noopener">Developer Tools</a></p>
-<p><a href="https://stackoverflow.com/questions/12744303/intellij-idea-java-classes-not-auto-compiling-on-save" target="_blank" rel="noopener">Intellij IDEA Java classes not auto compiling on save</a></p>
+<p>软件、硬件加速区别？</p>
+<p>无论哪种方式，都是将图像渲染到Surface上。</p>
+<h5 id="Surface："><a href="#Surface：" class="headerlink" title="Surface："></a>Surface：</h5><p>Surface是一个窗口，例如一个Activity是一个Surface，一个Dialog也是一个Surface。Surface位于App进程，承载了窗口的图形数据，与SurfaceFlinger侧的Layer对应。</p>
+<h5 id="BufferQueue："><a href="#BufferQueue：" class="headerlink" title="BufferQueue："></a>BufferQueue：</h5><p>BufferQueue是Surface和Layer的纽带。</p>
+<p>Native层的Surface实现了ANativeWindow结构体，构造函数中持有一个IGraphicBufferProducer，用于和BufferQueue交互。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">类声明：</span><br><span class="line">class Surface</span><br><span class="line">    : public ANativeObjectBase&lt;ANativeWindow, Surface, RefBase&gt;</span><br><span class="line"></span><br><span class="line">构造函数：</span><br><span class="line">Surface::Surface(const sp&lt;IGraphicBufferProducer&gt;&amp; bufferProducer, bool controlledByApp)</span><br></pre></td></tr></table></figure>
+<p>上层图形数据渲染到Surface，然后Surface通过IGraphicBufferProducer把GraphicBuffer提交到BufferQueue，即图形数据实际是渲染到BufferQueue中的一个GraphicBuffer，让SurfaceFlinger执行后续的合成显示工作。</p>
+<p>显示？</p>
+<h5 id="HWC"><a href="#HWC" class="headerlink" title="HWC"></a>HWC</h5><p>Hardware Composer，硬件混合渲染器，显示子系统的硬件抽象实现。</p>
+<blockquote>
+<p>HAL：<br>Hardware Abstraction Layer，硬件抽象层。Android HAL是连接Android Framework和Kernel的重要桥梁，主要目的是向下屏蔽设备及其驱动的实现细节，向上为系统服务以及Framework提供统一的设备访问接口。参考Android系统框架：<a href="https://source.android.com/devices/architecture" target="_blank" rel="noopener">&gt;&gt;</a></p>
+<p><img src="https://source.android.com/devices/images/ape_fwk_all.png" alt=""></p>
+</blockquote>
+<h3 id="BufferQueue"><a href="#BufferQueue" class="headerlink" title="BufferQueue"></a>BufferQueue</h3><p>Android图形系统包含两对生产者、消费者模型，都是通过BufferQueue进行连接：</p>
+<ol>
+<li>Canvas和OpenGL ES生成图形数据，SurfaceFlinger消费数据；</li>
+<li>SurfaceFlinger合成所有Layer的图形数据，Display进行显示。</li>
+</ol>
+<h3 id="SurfaceFlinger"><a href="#SurfaceFlinger" class="headerlink" title="SurfaceFlinger"></a>SurfaceFlinger</h3><p>Surface代表App进程中的一个窗口，承载窗口的图形数据。SurfaceFlinger是系统进程中合成所有窗口(Layer)图形数据的系统服务，然后送显到屏幕。</p>
+<p>SurfaceFlinger既是上层应用的图形数据消费者，又是Display的生产者。起到承上启下的作用。</p>
+<p>官方架构图：</p>
+<p><img src="https://source.android.com/devices/graphics/images/graphics-pipeline.png" alt="img"></p>
+<h3 id="屏幕画面显示流程"><a href="#屏幕画面显示流程" class="headerlink" title="屏幕画面显示流程"></a>屏幕画面显示流程</h3><p>Android显示系统，一般包括CPU、GPU、Display三个硬解部分。其中：</p>
+<ul>
+<li>CPU：负责计算图形数据，并交给GPU</li>
+<li><p>GPU：对图形数据进行渲染，渲染好后放到buffer中（其中SurfaceFlinger负责buffer的合成）</p>
+</li>
+<li><p>Display：屏幕或显示器，把GPU中合成好的buffer数据显示到屏幕上</p>
+</li>
+</ul>
+<h5 id="CPU计算图形数据"><a href="#CPU计算图形数据" class="headerlink" title="CPU计算图形数据"></a>CPU计算图形数据</h5><p>CPU计算图形数据指的就是View树的绘制过程，也就是Activity对应视图树从根布局DecorView层层遍历View，分别执行measure、layout、draw过程。该流程生成纹理和多边形，并送到GPU。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">measure+layout+draw  -&gt;  polygons texture</span><br></pre></td></tr></table></figure>
+<h5 id="GPU合成图形数据"><a href="#GPU合成图形数据" class="headerlink" title="GPU合成图形数据"></a>GPU合成图形数据</h5><p>GPU将CPU生成的纹理、多边形进行栅格化以及合成。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">polygons texture -&gt; rasterization</span><br></pre></td></tr></table></figure>
+<p>OpenGL的绘制流程中好像也有栅格化？</p>
+<h5 id="Display显示图形数据"><a href="#Display显示图形数据" class="headerlink" title="Display显示图形数据"></a>Display显示图形数据</h5><p>常说的16ms屏幕刷新一次，其实就是系统硬件16ms发送一次时钟信号，即vsync信号，通知Display将最新合成的图形数据显示到屏幕上。</p>
+<h3 id="三缓冲"><a href="#三缓冲" class="headerlink" title="三缓冲"></a>三缓冲</h3><p>为了解决双缓冲带来的卡顿问题，Android黄油计划推出了三缓冲，CPU、GPU、SurfaceFlinger各占一个Buffer，并行处理图像。</p>
+<h3 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h3><ul>
+<li><a href="https://source.android.com/devices/graphics?hl=zh-cn" target="_blank" rel="noopener">Android官方文档-图形</a></li>
+<li><a href="https://bytedance.feishu.cn/wiki/wikcnc7Xr7wyeBMfBsboo5UGY5P#" target="_blank" rel="noopener">https://bytedance.feishu.cn/wiki/wikcnc7Xr7wyeBMfBsboo5UGY5P#</a></li>
+<li><p><a href="http://gityuan.com/android/#45-%E5%9B%BE%E5%BD%A2%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97" target="_blank" rel="noopener">http://gityuan.com/android/#45-%E5%9B%BE%E5%BD%A2%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97</a></p>
+</li>
+<li><p><a href="https://sharrychoo.github.io/blog/android-source/graphic-overview" target="_blank" rel="noopener">https://sharrychoo.github.io/blog/android-source/graphic-overview</a></p>
+</li>
+<li><a href="https://juejin.cn/post/6898525503960186887" target="_blank" rel="noopener">https://juejin.cn/post/6898525503960186887</a></li>
+</ul>
 
       
     </div>
@@ -380,8 +420,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/07/15/Android源码 —— NestedScrolling/" rel="next" title="Android源码 —— NestedScrolling">
-                <i class="fa fa-chevron-left"></i> Android源码 —— NestedScrolling
+              <a href="/2019/08/05/Android系统架构 —— R文件/" rel="next" title="Android系统架构 —— R文件">
+                <i class="fa fa-chevron-left"></i> Android系统架构 —— R文件
               </a>
             
           </div>
@@ -390,8 +430,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/08/12/通用技术 —— 依赖注入和控制反转/" rel="prev" title="通用技术 —— 依赖注入和控制反转">
-                通用技术 —— 依赖注入和控制反转 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/11/28/Android系统架构 —— Choreographer/" rel="prev" title="Android系统架构 —— Choreographer">
+                Android系统架构 —— Choreographer <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -515,7 +555,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#热部署原理"><span class="nav-text">热部署原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#热部署devtools不生效"><span class="nav-text">热部署devtools不生效</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-Enable-Automake-from-the-compiler"><span class="nav-text">1 - Enable Automake from the compiler</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-Enable-Automake-when-the-application-is-running"><span class="nav-text">2 - Enable Automake when the application is running</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#疑问"><span class="nav-text">疑问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三种上屏方式"><span class="nav-text">三种上屏方式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Surface："><span class="nav-text">Surface：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#BufferQueue："><span class="nav-text">BufferQueue：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HWC"><span class="nav-text">HWC</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BufferQueue"><span class="nav-text">BufferQueue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SurfaceFlinger"><span class="nav-text">SurfaceFlinger</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#屏幕画面显示流程"><span class="nav-text">屏幕画面显示流程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#CPU计算图形数据"><span class="nav-text">CPU计算图形数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#GPU合成图形数据"><span class="nav-text">GPU合成图形数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Display显示图形数据"><span class="nav-text">Display显示图形数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三缓冲"><span class="nav-text">三缓冲</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文档"><span class="nav-text">参考文档</span></a></li></ol></div>
             
 
           </div>
